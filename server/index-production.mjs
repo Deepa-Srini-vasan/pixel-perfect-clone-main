@@ -57,8 +57,11 @@ const rateLimitStore = new Map();
 // Logging utility
 function log(level, message, data = {}) {
   const levels = { error: 0, warn: 1, info: 2, debug: 3 };
-  const logLevelNum = levels[config.LOG_LEVEL] ?? 2;
-  if (levels[level] <= logLevelNum) {
+  const cleanLogLevel = String(config.LOG_LEVEL).toLowerCase();
+  const logLevelNum = Object.prototype.hasOwnProperty.call(levels, cleanLogLevel) ? levels[cleanLogLevel] : 2;
+  const cleanLevel = String(level).toLowerCase();
+  const currentLevelNum = Object.prototype.hasOwnProperty.call(levels, cleanLevel) ? levels[cleanLevel] : 2;
+  if (currentLevelNum <= logLevelNum) {
     const timestamp = mysqlTimestamp();
     console.log(`[${timestamp}] [${level.toUpperCase()}] ${message}`, data);
   }
@@ -66,6 +69,64 @@ function log(level, message, data = {}) {
 
 function mysqlTimestamp() {
   return new Date().toISOString().slice(0, 19).replace('T', ' ');
+}
+
+// ============================================================================
+// RATE LIMITING (IP-based for enquiries)
+// ============================================================================
+
+const enquiryRateLimiter = (() => {
+  const store = new Map(); // IP -> { count, resetTime }
+  const WINDOW_MS = 10 * 60 * 1000; // 10 minutes
+  const MAX_PER_WINDOW = 5;
+
+  return (ip) => {
+    const now = Date.now();
+    const record = store.get(ip);
+
+    // Clean up expired entries
+    if (record && record.resetTime < now) {
+      store.delete(ip);
+      return true;
+    }
+
+    if (!record) {
+      store.set(ip, { count: 1, resetTime: now + WINDOW_MS });
+      return true;
+    }
+
+    if (record.count < MAX_PER_WINDOW) {
+      record.count++;
+      return true;
+    }
+
+    return false; // Rate limit exceeded
+  };
+})();
+
+// ============================================================================
+// INPUT VALIDATION
+// ============================================================================
+
+function validateEnquiryPayload(payload) {
+  const name = String(payload.name ?? '').trim();
+  const email = String(payload.email ?? '').trim();
+  const phone = String(payload.phone ?? '').trim();
+  const subject = String(payload.subject ?? '').trim();
+  const message = String(payload.message ?? '').trim();
+
+  const errors = [];
+  if (!name || name.length > 100) errors.push('name must be 1-100 characters');
+  if (!email || !/^[^@]+@[^@]+\.[^@]+$/.test(email)) errors.push('email must be valid');
+  if (phone && phone.length > 20) errors.push('phone must be max 20 characters');
+  if (subject && subject.length > 200) errors.push('subject must be max 200 characters');
+  if (!message || message.length > 2000) errors.push('message must be 1-2000 characters');
+
+  if (errors.length > 0) {
+    return { error: errors.join('; '), value: null };
+  }
+
+  return { value: { name, email, phone, subject, message }, error: null };
 }
 
 // ============================================================================
@@ -181,6 +242,7 @@ function sendJson(res, statusCode, body) {
   res.writeHead(statusCode, {
     'Content-Type': 'application/json; charset=utf-8',
     'Access-Control-Allow-Origin': origin,
+    'Access-Control-Allow-Credentials': 'true',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-API-Key',
     'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,OPTIONS',
     'X-Content-Type-Options': 'nosniff',
@@ -220,9 +282,47 @@ async function readJson(req) {
   }
 }
 
+// Parse cookies from request headers
+function parseCookies(req) {
+  const cookie = req.headers.cookie || '';
+  return cookie.split(';').reduce((acc, cur) => {
+    const [key, val] = cur.trim().split('=');
+    if (key && val) acc[key] = decodeURIComponent(val);
+    return acc;
+  }, {});
+}
+
+// Set httpOnly cookie in response
+function setCookie(res, name, value, options = {}) {
+  const defaults = {
+    httpOnly: true,
+    secure: IS_PRODUCTION,
+    sameSite: IS_PRODUCTION ? 'None' : 'Lax', // Lax for dev (different ports), None for prod
+    path: '/',
+    maxAge: 7 * 24 * 60 * 60, // 7 days in seconds
+    ...options,
+  };
+  const parts = [`${name}=${encodeURIComponent(value)}`];
+  if (defaults.maxAge) parts.push(`Max-Age=${defaults.maxAge}`);
+  if (defaults.secure) parts.push('Secure');
+  if (defaults.httpOnly) parts.push('HttpOnly');
+  if (defaults.sameSite) parts.push(`SameSite=${defaults.sameSite}`);
+  if (defaults.path) parts.push(`Path=${defaults.path}`);
+  res.setHeader('Set-Cookie', parts.join('; '));
+}
+
+// Clear cookie
+function clearCookie(res, name) {
+  const sameSiteValue = IS_PRODUCTION ? 'None' : 'Lax';
+  const parts = [`${name}=`, 'Path=/', 'Expires=Thu, 01 Jan 1970 00:00:00 UTC', 'HttpOnly', `SameSite=${sameSiteValue}`];
+  if (IS_PRODUCTION) parts.push('Secure');
+  res.setHeader('Set-Cookie', parts.join('; '));
+}
+
+// Extract token from httpOnly cookie
 function requireAuth(req) {
-  const header = req.headers.authorization || '';
-  const token = header.startsWith('Bearer ') ? header.slice(7) : null;
+  const cookies = parseCookies(req);
+  const token = cookies.plumtek_session || null;
   if (!token) return null;
   return verifyToken(token);
 }
@@ -248,6 +348,16 @@ function parsePositiveIntOrThrow(value, name) {
     throw new HttpError(400, `Invalid ${name}`);
   }
   return num;
+}
+
+function parseNonNegativeInt(value, fallback = 0) {
+  const num = Number.parseInt(String(value ?? ''), 10);
+  return Number.isInteger(num) && num >= 0 ? num : fallback;
+}
+
+function parseBoundedInt(value, fallback, min, max) {
+  const num = parseNonNegativeInt(value, fallback);
+  return Math.min(Math.max(num, min), max);
 }
 
 function validateStartupConfig() {
@@ -421,7 +531,7 @@ async function initializeDatabase() {
     // Check if admin exists
     const [admin] = await db.executeQuery('SELECT id FROM admin_users LIMIT 1');
     if (!admin && config.SEED_DATABASE) {
-        const timestamp = mysqlTimestamp();
+      const timestamp = mysqlTimestamp();
       await db.executeQuery(
         'INSERT INTO admin_users (email, password_hash, name, role, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)',
         [
@@ -514,7 +624,7 @@ async function initializeDatabase() {
           catsToSeed.push({ name: row.category, slug: row.category.toLowerCase().replace(/[^a-z0-9]+/g, '-') });
         }
       }
-      
+
       if (catsToSeed.length === 0) {
         catsToSeed.push(
           { name: 'Pipes', slug: 'pipes' },
@@ -557,6 +667,7 @@ async function handleRequest(req, res) {
       'Access-Control-Allow-Origin': getCorsHeader(req),
       'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-API-Key',
       'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,OPTIONS',
+      'Access-Control-Allow-Credentials': 'true',
     });
     res.end();
     return;
@@ -570,7 +681,7 @@ async function handleRequest(req, res) {
       return sendJson(res, 200, { ok: true, env: config.NODE_ENV });
     }
 
-    // Login
+    // Login — set httpOnly cookie, never expose token to JS
     if (pathname === '/api/auth/login' && req.method === 'POST') {
       const payload = await readJson(req);
       const [user] = await db.executeQuery('SELECT * FROM admin_users WHERE email = ? AND is_active = 1 LIMIT 1', [payload.email]);
@@ -579,9 +690,11 @@ async function handleRequest(req, res) {
         return sendJson(res, 401, { error: 'Invalid credentials' });
       }
       const token = signToken({ userId: user.id, email: user.email, role: user.role });
+      setCookie(res, 'plumtek_session', token);
       await db.executeQuery('UPDATE admin_users SET last_login = NOW() WHERE id = ?', [user.id]);
       log('info', 'User logged in', { email: user.email, ip });
-      return sendJson(res, 200, { token, user: { id: user.id, email: user.email, role: user.role, name: user.name } });
+      // Do NOT return token to client — it's in the httpOnly cookie
+      return sendJson(res, 200, { user: { id: user.id, email: user.email, role: user.role, name: user.name } });
     }
 
     // Get current user
@@ -593,39 +706,81 @@ async function handleRequest(req, res) {
       return sendJson(res, 200, { user });
     }
 
-    // Get products by category
+    // Logout — clear httpOnly cookie
+    if (pathname === '/api/auth/logout' && req.method === 'POST') {
+      clearCookie(res, 'plumtek_session');
+      log('info', 'User logged out', { ip });
+      return sendJson(res, 200, { success: true });
+    }
+
+    // Get products by category (Supports pagination, sorting, search, and category strings/ids)
     if (pathname === '/api/products' && req.method === 'GET') {
       const params = new URLSearchParams(query);
       const search = params.get('search') || '';
       const categoryId = params.get('categoryId') || '';
+      const category = params.get('category') || '';
       const featured = params.get('featured');
+      const page = Math.max(1, Number.parseInt(params.get('page') || '1', 10));
+      const limit = Math.min(Math.max(1, Number.parseInt(params.get('limit') || '24', 10)), 200);
+      const sort = params.get('sort') || 'latest';
 
+      let countSql = 'SELECT COUNT(DISTINCT p.id) as total FROM products p LEFT JOIN categories c ON p.category_id = c.id WHERE p.is_active = 1';
       let sql = 'SELECT p.*, c.name as category_name FROM products p LEFT JOIN categories c ON p.category_id = c.id WHERE p.is_active = 1';
       const values = [];
 
+      let filterSql = '';
       if (search) {
-        sql += ' AND (p.name LIKE ? OR p.short_description LIKE ?)';
+        filterSql += ' AND (p.name LIKE ? OR p.short_description LIKE ? OR p.description LIKE ?)';
         const searchVal = `%${search}%`;
-        values.push(searchVal, searchVal);
+        values.push(searchVal, searchVal, searchVal);
       }
       if (categoryId) {
-        sql += ' AND p.category_id = ?';
-        values.push(categoryId);
+        filterSql += ' AND p.category_id = ?';
+        values.push(Number.parseInt(categoryId, 10) || 0);
+      } else if (category) {
+        filterSql += ' AND (p.category = ? OR c.name = ?)';
+        values.push(category, category);
       }
       if (featured === 'true') {
-        sql += ' AND p.is_featured = 1';
+        filterSql += ' AND p.is_featured = 1';
       }
 
-      sql += ' ORDER BY p.created_at DESC LIMIT 100';
+      countSql += filterSql;
+      sql += filterSql;
+
+      // Count total matching items
+      const countResult = await db.executeQuery(countSql, values);
+      const total = countResult[0]?.total || 0;
+
+      // Dynamic sorting
+      let order = 'p.created_at DESC, p.id DESC';
+      if (sort === 'name-asc') order = 'p.name ASC';
+      if (sort === 'name-desc') order = 'p.name DESC';
+
+      const offset = (page - 1) * limit;
+      sql += ` ORDER BY ${order} LIMIT ${limit} OFFSET ${offset}`;
+
       const products = await db.executeQuery(sql, values);
-      return sendJson(res, 200, { products: products.map(rowToProduct) });
+
+      return sendJson(res, 200, {
+        products: products.map(rowToProduct),
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      });
     }
 
-    // Get categories
+    // Get categories with dynamic product counts
     if (pathname === '/api/categories' && req.method === 'GET') {
-      const categories = await db.executeQuery(
-        'SELECT id, name, slug, is_active FROM categories WHERE is_active = 1 ORDER BY display_order, name'
-      );
+      const categories = await db.executeQuery(`
+        SELECT c.id, c.name, c.slug, c.is_active, COUNT(p.id) AS count
+        FROM categories c
+        LEFT JOIN products p ON (p.category_id = c.id OR p.category = c.name) AND p.is_active = 1
+        WHERE c.is_active = 1
+        GROUP BY c.id
+        ORDER BY c.display_order, c.name
+      `);
       return sendJson(res, 200, { categories });
     }
 
@@ -785,7 +940,9 @@ async function handleRequest(req, res) {
       const settings = await db.executeQuery('SELECT key_name, value, data_type FROM settings ORDER BY key_name');
       const result = {};
       settings.forEach(s => {
-        result[s.key_name] = s.value;
+        if (s.key_name && s.key_name !== '__proto__' && s.key_name !== 'constructor') {
+          Reflect.set(result, s.key_name, s.value);
+        }
       });
       return sendJson(res, 200, { settings: result });
     }
@@ -810,8 +967,8 @@ async function handleRequest(req, res) {
 
     if (pathname === '/api/admin/activity-logs' && req.method === 'GET' && tokenData) {
       const params = new URLSearchParams(query);
-      const limit = Math.min(Math.max(Number(params.get('limit')) || 100, 1), 500);
-      const offset = Math.max(Number(params.get('offset')) || 0, 0);
+      const limit = parseBoundedInt(params.get('limit'), 100, 1, 500);
+      const offset = parseNonNegativeInt(params.get('offset'), 0);
       const entityType = params.get('entityType');
 
       let sql = 'SELECT al.*, u.name FROM activity_logs al LEFT JOIN admin_users u ON al.admin_user_id = u.id WHERE 1=1';
@@ -822,8 +979,7 @@ async function handleRequest(req, res) {
         values.push(entityType);
       }
 
-      sql += ' ORDER BY al.created_at DESC LIMIT ? OFFSET ?';
-      values.push(limit, offset);
+      sql += ` ORDER BY al.created_at DESC LIMIT ${limit} OFFSET ${offset}`;
 
       const logs = await db.executeQuery(sql, values);
       return sendJson(res, 200, { logs });
@@ -908,8 +1064,8 @@ async function handleRequest(req, res) {
       const params = new URLSearchParams(query);
       const search = params.get('search') || '';
       const categoryId = params.get('categoryId');
-      const limit = Math.min(Math.max(Number(params.get('limit')) || 50, 1), 500);
-      const offset = Math.max(Number(params.get('offset')) || 0, 0);
+      const limit = parseBoundedInt(params.get('limit'), 50, 1, 500);
+      const offset = parseNonNegativeInt(params.get('offset'), 0);
 
       let sql = 'SELECT p.*, c.name as category_name FROM products p LEFT JOIN categories c ON p.category_id = c.id WHERE 1=1';
       const values = [];
@@ -1008,8 +1164,12 @@ async function handleRequest(req, res) {
 
     // ========== ENQUIRY ENDPOINTS ==========
 
-    // Submit new enquiry (public)
+    // Submit new enquiry (public) — rate limited by IP
     if (pathname === '/api/enquiries' && req.method === 'POST') {
+      if (!enquiryRateLimiter(ip)) {
+        return sendJson(res, 429, { error: 'Too many enquiries. Please wait before submitting another.' });
+      }
+
       const payload = await readJson(req);
       const validated = validateEnquiryPayload(payload);
       if (validated.error) return sendJson(res, 400, { error: validated.error });
@@ -1062,8 +1222,8 @@ async function handleRequest(req, res) {
       const status = params.get('status');
       const search = params.get('search') || '';
       const unreadOnly = params.get('unread') === 'true';
-      const limit = Math.min(Number(params.get('limit')) || 50, 500);
-      const offset = Math.max(Number(params.get('offset')) || 0, 0);
+      const limit = parseBoundedInt(params.get('limit'), 50, 1, 500);
+      const offset = parseNonNegativeInt(params.get('offset'), 0);
 
       let sql = 'SELECT * FROM enquiries WHERE 1=1';
       const values = [];
@@ -1081,8 +1241,7 @@ async function handleRequest(req, res) {
         values.push(searchVal, searchVal, searchVal, searchVal);
       }
 
-      sql += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';
-      values.push(limit, offset);
+      sql += ` ORDER BY created_at DESC LIMIT ${limit} OFFSET ${offset}`;
 
       const enquiries = await db.executeQuery(sql, values);
       return sendJson(res, 200, { enquiries: enquiries.map(rowToEnquiry) });
@@ -1208,8 +1367,8 @@ function validateProductPayload(payload) {
     : [];
   const specs = Array.isArray(payload.specs)
     ? payload.specs
-        .map((item) => ({ label: String(item?.label ?? '').trim(), value: String(item?.value ?? '').trim() }))
-        .filter((item) => item.label && item.value)
+      .map((item) => ({ label: String(item?.label ?? '').trim(), value: String(item?.value ?? '').trim() }))
+      .filter((item) => item.label && item.value)
     : [];
 
   const imageKey = String(payload.imageKey ?? '').trim();
@@ -1262,34 +1421,6 @@ async function logActivity(userId, action, entityType, entityId, oldValues = nul
   } catch (e) {
     log('warn', 'Failed to log activity', { error: e.message });
   }
-}
-
-function validateEnquiryPayload(payload) {
-  const name = String(payload.name ?? '').trim();
-  const email = String(payload.email ?? '').trim();
-  const message = String(payload.message ?? '').trim();
-
-  if (!name || !email || !message) {
-    return { error: 'name, email, and message are required.' };
-  }
-
-  // Simple email validation
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return { error: 'Invalid email format.' };
-  }
-
-  const phone = String(payload.phone ?? '').trim();
-  const subject = String(payload.subject ?? '').trim();
-
-  return {
-    value: {
-      name,
-      email,
-      phone: phone || null,
-      subject: subject || null,
-      message,
-    },
-  };
 }
 
 function rowToEnquiry(row) {

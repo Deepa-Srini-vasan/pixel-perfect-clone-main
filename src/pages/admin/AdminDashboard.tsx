@@ -70,23 +70,23 @@ export default function AdminDashboard() {
   ];
 
   const getActionLabel = (action: string) => {
-    const labels: { [key: string]: string } = {
-      create: "Created",
-      update: "Updated",
-      delete: "Deleted",
-    };
-    return labels[action] || action;
+    const labels = new Map<string, string>([
+      ["create", "Created"],
+      ["update", "Updated"],
+      ["delete", "Deleted"],
+    ]);
+    return labels.get(action) || action;
   };
 
   const getEntityIcon = (entityType: string) => {
-    const icons: Record<string, LucideIcon> = {
-      product: Package,
-      category: TrendingUp,
-      inventory: AlertCircle,
-      user: Users,
-      settings: Settings,
-    };
-    return icons[entityType] || Activity;
+    const icons = new Map<string, LucideIcon>([
+      ["product", Package],
+      ["category", TrendingUp],
+      ["inventory", AlertCircle],
+      ["user", Users],
+      ["settings", Settings],
+    ]);
+    return icons.get(entityType) || Activity;
   };
 
   return (

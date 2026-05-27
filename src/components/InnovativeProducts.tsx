@@ -84,7 +84,7 @@ const InnovativeProducts = () => {
           </div>
 
           {/* Right - Products */}
-          <div className="grid grid-cols-2 gap-6" data-animate>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6" data-animate>
             {products.map((product) => (
               <ProductCard
                 key={product.slug}

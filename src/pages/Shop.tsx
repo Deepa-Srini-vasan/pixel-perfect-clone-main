@@ -269,7 +269,7 @@ const Shop = () => {
                           >
                             <div className="mb-3 aspect-square overflow-hidden rounded-xl bg-slate-50 flex items-center justify-center p-2">
                               <img
-                                src={categoryImageLookup[category.name] ?? categoryImageLookup["Hoses"]}
+                                src={categoryImageLookup.get(category.name) ?? categoryImageLookup.get("Hoses")}
                                 alt={normalizeCategoryName(category.name)}
                                 className="h-full w-full object-contain transition-transform duration-500 group-hover:scale-110 mix-blend-multiply"
                               />

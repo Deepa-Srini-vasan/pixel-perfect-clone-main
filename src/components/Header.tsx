@@ -4,19 +4,19 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import logo from "@/assets/logo.png";
 
 const navItems = [
-  { label: "Home",      to: "/" },
-  { label: "About",     to: "/about" },
-  { label: "Store",     to: "/shop" },
-  { label: "Catalogs",  to: "/catalogs" },
-  { label: "Contact",   to: "/contact" },
+  { label: "Home", to: "/" },
+  { label: "About", to: "/about" },
+  { label: "Store", to: "/shop" },
+  { label: "Catalogs", to: "/catalogs" },
+  { label: "Contact", to: "/contact" },
 ];
 
 const Header = () => {
-  const [mobileOpen, setMobileOpen]   = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [scrolled, setScrolled]       = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
-  const navigate  = useNavigate();
+  const navigate = useNavigate();
 
   /* Detect scroll for header shadow boost */
   useEffect(() => {
@@ -80,6 +80,7 @@ const Header = () => {
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
             <input
               type="search"
+              data-testid="header-search"
               aria-label="Search products"
               placeholder="Search SKUs, products…"
               value={searchQuery}

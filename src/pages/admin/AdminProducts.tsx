@@ -17,7 +17,7 @@ import {
 } from "@/lib/api";
 import { categoryImageLookup, productImageLookup, resolveProductImage } from "@/lib/catalog-assets";
 
-const imageOptions = Object.keys(productImageLookup);
+const imageOptions = Array.from(productImageLookup.keys());
 
 const emptyForm = {
   name: "",
@@ -193,7 +193,7 @@ const AdminProducts = () => {
   };
 
   const busy = createMutation.isPending || updateMutation.isPending;
-  const activeImage = resolveProductImage(form.imageKey, form.imageData) || categoryImageLookup[form.category];
+  const activeImage = resolveProductImage(form.imageKey, form.imageData) || categoryImageLookup.get(form.category);
 
   return (
     <div className="space-y-6">
@@ -341,7 +341,7 @@ const AdminProducts = () => {
               </div>
               <div className="rounded-2xl border border-border bg-white p-3 text-xs text-muted-foreground">
                 <p className="font-semibold text-foreground">Category suggestions</p>
-                <p className="mt-1">{categoryImageLookup[form.category] ? "Category image available" : "No category image mapping yet"}</p>
+                <p className="mt-1">{categoryImageLookup.get(form.category) ? "Category image available" : "No category image mapping yet"}</p>
               </div>
             </div>
           </div>

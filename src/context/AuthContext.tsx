@@ -1,11 +1,11 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import { clearAuthToken, fetchCurrentUser, loginAdmin, type AdminUser } from "@/lib/api";
+import { fetchCurrentUser, logoutAdmin, loginAdmin, type AdminUser } from "@/lib/api";
 
 interface AuthContextValue {
   user: AdminUser | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
 }
 
@@ -20,7 +20,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const response = await fetchCurrentUser();
       setUser(response.user);
     } catch {
-      clearAuthToken();
+      // User is not authenticated; httpOnly cookie expired or invalid
       setUser(null);
     } finally {
       setLoading(false);
@@ -36,8 +36,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser(response.user);
   };
 
-  const logout = () => {
-    clearAuthToken();
+  const logout = async () => {
+    await logoutAdmin();
     setUser(null);
   };
 

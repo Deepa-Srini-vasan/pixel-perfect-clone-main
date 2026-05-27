@@ -26,7 +26,7 @@ git clone <git-url>
 # Install dependencies
 npm install
 
-# Start the development server
+# Start the frontend and API together
 npm run dev
 ```
 

@@ -15,7 +15,7 @@ interface SettingValue {
 
 export default function AdminSettings() {
   const { user } = useAuth();
-  const [settings, setSettings] = useState<SettingValue>({});
+  const [settings, setSettings] = useState<Map<string, string>>(new Map());
   const [isSaving, setIsSaving] = useState(false);
 
   const { data, isLoading } = useQuery<{ settings: SettingValue }>({
@@ -31,7 +31,7 @@ export default function AdminSettings() {
 
   useEffect(() => {
     if (data?.settings) {
-      setSettings(data.settings);
+      setSettings(new Map(Object.entries(data.settings)));
     }
   }, [data]);
 
@@ -41,7 +41,7 @@ export default function AdminSettings() {
       const res = await fetch(apiUrl("/api/admin/settings"), {
         method: "PUT",
         headers: { "Content-Type": "application/json", ...getAuthHeaders() },
-        body: JSON.stringify(settings),
+        body: JSON.stringify(Object.fromEntries(settings)),
       });
       if (!res.ok) throw new Error("Failed to save settings");
       alert("Settings saved successfully!");
@@ -54,11 +54,19 @@ export default function AdminSettings() {
   };
 
   const handleChange = (key: string, value: string) => {
-    setSettings({ ...settings, [key]: value });
+    setSettings((prev) => {
+      const next = new Map(prev);
+      next.set(key, value);
+      return next;
+    });
   };
 
   const handleToggle = (key: string, checked: boolean) => {
-    setSettings({ ...settings, [key]: checked ? "true" : "false" });
+    setSettings((prev) => {
+      const next = new Map(prev);
+      next.set(key, checked ? "true" : "false");
+      return next;
+    });
   };
 
   if (!user) return <div>Please log in</div>;
@@ -104,7 +112,7 @@ export default function AdminSettings() {
                     {key === "enquiry_email_notifications" ? (
                       <div className="flex items-center gap-3 rounded-lg border border-border px-3 py-3">
                         <Checkbox
-                          checked={settings[key] === "true"}
+                          checked={settings.get(key) === "true"}
                           onCheckedChange={(checked) => handleToggle(key, checked === true)}
                         />
                         <div>
@@ -114,13 +122,13 @@ export default function AdminSettings() {
                       </div>
                     ) : key === "site_description" || key === "site_address" ? (
                       <Textarea
-                        value={settings[key] || ""}
+                        value={settings.get(key) || ""}
                         onChange={(e) => handleChange(key, e.target.value)}
                         rows={3}
                       />
                     ) : (
                       <Input
-                        value={settings[key] || ""}
+                        value={settings.get(key) || ""}
                         onChange={(e) => handleChange(key, e.target.value)}
                         type={key === "vat_rate" || key === "items_per_page" ? "number" : "text"}
                       />

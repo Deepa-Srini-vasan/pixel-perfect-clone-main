@@ -62,32 +62,24 @@ export interface AdminDashboardResponse {
 }
 
 const API_BASE = import.meta.env.VITE_API_URL?.trim() || (import.meta.env.DEV ? "" : "http://127.0.0.1:8787");
-const AUTH_TOKEN_KEY = "plumtek_admin_token";
 
-export const getAuthToken = () => localStorage.getItem(AUTH_TOKEN_KEY);
-export const setAuthToken = (token: string) => localStorage.setItem(AUTH_TOKEN_KEY, token);
-export const clearAuthToken = () => localStorage.removeItem(AUTH_TOKEN_KEY);
+// No token storage needed — httpOnly cookies handle auth automatically
 export const apiUrl = (path: string) => `${API_BASE}${path}`;
-export const getAuthHeaders = () => {
-  const token = getAuthToken();
-  return token ? { Authorization: `Bearer ${token}` } : {};
-};
 
-async function request<T>(path: string, options: RequestInit = {}, authenticated = false): Promise<T> {
+// Auth headers are no longer needed since httpOnly cookies are sent automatically
+// This function is kept for backward compatibility with existing code
+export const getAuthHeaders = () => ({});
+
+async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const headers = new Headers(options.headers ?? {});
   if (!(options.body instanceof FormData) && !headers.has("Content-Type")) {
     headers.set("Content-Type", "application/json");
-  }
-  if (authenticated) {
-    const token = getAuthToken();
-    if (token) {
-      headers.set("Authorization", `Bearer ${token}`);
-    }
   }
 
   const response = await fetch(apiUrl(path), {
     ...options,
     headers,
+    credentials: 'include', // Always include cookies
   });
 
   const payload = await response.json().catch(() => ({}));
@@ -99,16 +91,17 @@ async function request<T>(path: string, options: RequestInit = {}, authenticated
 }
 
 export const loginAdmin = async (email: string, password: string) => {
-  const response = await request<{ token: string; user: AdminUser }>("/api/auth/login", {
+  const response = await request<{ user: AdminUser }>("/api/auth/login", {
     method: "POST",
     body: JSON.stringify({ email, password }),
   });
-  setAuthToken(response.token);
+  // Token is now in httpOnly cookie — no need to store it in JS
   return response;
 };
 
-export const fetchCurrentUser = async () => request<{ user: AdminUser }>("/api/auth/me", {}, true);
-export const fetchAdminDashboard = async () => request<AdminDashboardResponse>("/api/admin/dashboard", {}, true);
+export const fetchCurrentUser = async () => request<{ user: AdminUser }>("/api/auth/me", {});
+export const logoutAdmin = async () => request<{ success: boolean }>("/api/auth/logout", { method: "POST" });
+export const fetchAdminDashboard = async () => request<AdminDashboardResponse>("/api/admin/dashboard", {});
 export const fetchProducts = async (
   search = "",
   category = "",
@@ -128,36 +121,35 @@ export const fetchProducts = async (
 
 export const fetchProductBySlug = async (slug: string) => request<{ product: ApiProduct }>(`/api/products/${slug}`);
 export const fetchCategories = async () => request<{ categories: Array<{ id?: number; name: string; count?: number }> }>("/api/categories");
-export const fetchAdminProducts = async () => request<{ products: ApiProduct[] }>("/api/admin/products?limit=500", {}, true);
+export const fetchAdminProducts = async () => request<{ products: ApiProduct[] }>("/api/admin/products?limit=500", {});
 export const createAdminProduct = async (payload: Partial<ApiProduct>) => request<{ product: ApiProduct }>("/api/admin/products", {
   method: "POST",
   body: JSON.stringify(payload),
-}, true);
+});
 export const updateAdminProduct = async (id: number, payload: Partial<ApiProduct>) => request<{ product: ApiProduct }>(`/api/admin/products/${id}`, {
   method: "PUT",
   body: JSON.stringify(payload),
-}, true);
+});
 export const deleteAdminProduct = async (id: number) => request<{ success: boolean }>(`/api/admin/products/${id}`, {
   method: "DELETE",
-}, true);
+});
 
-export const fetchAdminUsers = async () => request<{ users: AdminUser[] }>("/api/admin/users", {}, true);
+export const fetchAdminUsers = async () => request<{ users: AdminUser[] }>("/api/admin/users", {});
 export const createAdminUser = async (payload: { email: string; name: string; password: string; role: string }) =>
   request<{ user: AdminUser }>("/api/admin/users", {
     method: "POST",
     body: JSON.stringify(payload),
-  }, true);
+  });
 export const updateAdminUser = async (id: number, payload: { name: string; password?: string; role: string }) =>
   request<{ user: AdminUser }>(`/api/admin/users/${id}`, {
     method: "PUT",
     body: JSON.stringify(payload),
-  }, true);
+  });
 
 export const fetchActivityLogs = async (limit = 50) =>
   request<{ logs: Array<{ id: number; admin_user_id: number; action: string; entity_type: string; entity_id: number; name: string; created_at: string }> }>(
     `/api/admin/activity-logs?limit=${limit}`,
-    {},
-    true
+    {}
   );
 
 export const productQueryKey = (filters: { search?: string; category?: string } = {}) => ["products", filters];

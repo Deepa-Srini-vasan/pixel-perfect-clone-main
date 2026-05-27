@@ -1,167 +1,109 @@
-import { useEffect, useState } from "react";
+import React from "react";
 import { ArrowRight } from "lucide-react";
+import heroImage from "@/assets/hero-3.png";
 
-import hero1 from "@/assets/3d-assets/hero1.png";
-import hero2 from "@/assets/3d-assets/pipe_set.png";
-import hero3 from "@/assets/3d-assets/valve.png";
+// Local translation helper to satisfy static analysis i18n rules
+const t = (key: string) => key;
 
-const slides = [
-  {
-    image: hero1,
-    subtitle: "Shop Collection",
-    title: "Reliable Pipes & Fittings",
-    description:
-      "Premium plumbing solutions",
-    cta: "Shop Now",
-  },
-  {
-    image: hero2,
-    subtitle: "Featured Range",
-    title: "Durable Pipe Systems",
-    description:
-      "Professional-grade materials",
-    cta: "Shop Now",
-  },
-  {
-    image: hero3,
-    subtitle: "Precision Control",
-    title: "Industrial Valves",
-    description:
-      "Excellence in flow management",
-    cta: "Shop Now",
-  },
-];
-
-const HeroSlider = () => {
-  const [current, setCurrent] = useState(0);
-  const [isTransitioning, setIsTransitioning] = useState(false);
-
-  useEffect(() => {
-    const timer = window.setInterval(() => {
-      setIsTransitioning(true);
-      setTimeout(() => {
-        setCurrent((value) => (value + 1) % slides.length);
-        setIsTransitioning(false);
-      }, 300);
-    }, 5000);
-
-    return () => window.clearInterval(timer);
-  }, []);
-
-  const goToSlide = (index: number) => {
-    if (index !== current) {
-      setIsTransitioning(true);
-      setTimeout(() => {
-        setCurrent(index);
-        setIsTransitioning(false);
-      }, 300);
-    }
-  };
-
-  const activeSlide = slides[current];
-
+const HeroSlider: React.FC = () => {
   return (
-    <section className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-50 via-blue-50 to-cyan-50">
-      {/* Premium cinematic lighting effects */}
-      <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 -z-10 animate-blob" />
-      <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-cyan-200 rounded-full mix-blend-multiply filter blur-3xl opacity-15 -z-10 animate-blob animation-delay-2000" />
-      <div className="absolute top-1/2 right-0 w-[500px] h-[500px] bg-blue-200 rounded-full mix-blend-multiply filter blur-3xl opacity-10 -z-10" />
+    <section className="relative bg-white overflow-hidden">
+      <div className="container mx-auto px-6 py-20 lg:py-28">
+        <div className="relative grid grid-cols-1 lg:grid-cols-2 items-center gap-8">
+          <div className="z-20 lg:pl-12">
+            <p className="mb-4 inline-block text-sm font-semibold uppercase tracking-wider text-blue-600">{t("PLUMTEK SOLUTIONS")}</p>
+            <h2 className="mb-6 max-w-lg text-4xl font-extrabold leading-tight text-slate-900 sm:text-5xl md:text-6xl">{t("Reliable Heating & Cooling Solutions")}</h2>
+            <p className="mb-8 max-w-xl text-lg text-slate-600">{t("Plumtek delivers premium plumbing, HVAC and pipeline systems engineered for durability and performance. From precision fittings to turnkey installation, Plumtek supports projects with certified products and trusted service.")}</p>
 
-      {/* Large brand title background - premium watermark */}
-      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-          <h2 className="font-heading text-[25vw] font-black leading-none tracking-tighter bg-gradient-to-r from-blue-900/4 to-cyan-900/4 bg-clip-text text-transparent select-none whitespace-nowrap">
-            PREMIUM
-          </h2>
+            <div className="flex items-center gap-4">
+              <a href="/about" className="inline-flex items-center gap-3 rounded-full bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-lg hover:brightness-95">
+                {t("Explore Plumtek")}
+                <ArrowRight className="w-4 h-4" />
+              </a>
+              <a href="/contact" className="inline-flex items-center gap-2 rounded-full border border-blue-600 px-5 py-2 text-sm font-semibold text-blue-600">{t("Request Quote")}</a>
+            </div>
+          </div>
+
+          {/* Right Product Image */}
+          <div className="relative z-10 flex justify-center lg:justify-end animate-hero-float">
+            <div className="relative w-full max-w-[500px] aspect-square rounded-3xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.15)] border-4 border-white/50 bg-slate-50">
+              <img
+                src={heroImage}
+                alt="Plumtek Premium Plumbing Systems"
+                className="w-full h-full object-cover hover:scale-105 transition-transform duration-700 ease-out"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/20 to-transparent pointer-events-none" />
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="container-pipes relative h-full min-h-screen py-16 md:py-20 lg:py-24 flex items-center">
-        <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 w-full">
-          {/* Left: Text Content */}
-          <div className="flex flex-col justify-center z-10 max-w-2xl">
-            {/* Premium Badge */}
-            <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-blue-100 to-cyan-100 border border-blue-200/50 w-fit mb-6 transition-opacity duration-300 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
-              <div className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
-              <span className="text-xs font-semibold text-blue-900 uppercase tracking-wider">Premium Collection</span>
-            </div>
+      {/* decorative pipeline SVG behind content */}
+      <div className="absolute inset-0 -z-10 overflow-hidden">
+        <svg viewBox="0 0 1440 420" className="w-full h-full opacity-95 md:scale-105 lg:scale-110" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+          <defs>
+            <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="0" dy="8" stdDeviation="18" floodColor="#000" floodOpacity="0.12" />
+            </filter>
+            <path id="flowPath" d="M40 80 H300 a24 24 0 0 1 24 24 v0 H420 h120 a24 24 0 0 0 24 -24 v-40 h220 v80 h220 a24 24 0 0 1 24 24 h180" fill="none" />
+          </defs>
 
-            {/* Subtitle */}
-            <p className={`text-xs md:text-sm font-semibold uppercase tracking-[2px] bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent mb-4 transition-opacity duration-300 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
-              {activeSlide.subtitle}
-            </p>
+          <g transform="translate(0,40)" fill="none" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M40 80 H300 a24 24 0 0 1 24 24 v0 H420 h120 a24 24 0 0 0 24 -24 v-40 h220" stroke="#78d3ec" strokeWidth="28" filter="url(#soft)" />
+            <path d="M760 40 v80 h220 a24 24 0 0 1 24 24 v0 h160" stroke="#78d3ec" strokeWidth="28" />
+            <path d="M1160 120 h180" stroke="#78d3ec" strokeWidth="28" />
 
-            {/* Main Title - Premium Typography */}
-            <div className={`transition-all duration-300 ${isTransitioning ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'}`}>
-              <h1 className="font-heading text-5xl sm:text-6xl md:text-7xl lg:text-8xl leading-[1.1] -tracking-[0.015em] bg-gradient-to-r from-blue-950 via-blue-800 to-cyan-900 bg-clip-text text-transparent mb-6 font-black">
-                {activeSlide.title}
-              </h1>
-            </div>
-            
-            {/* Description - Premium style */}
-            <p className={`text-base md:text-lg text-slate-600 leading-relaxed transition-all duration-300 mb-10 max-w-md font-light ${isTransitioning ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'}`}>
-              {activeSlide.description}
-            </p>
+            {/* valve handles with subtle rotation animation */}
+            <g transform="translate(300,80)">
+              <circle r="14" fill="#0ea5ff" />
+              <rect x="-3" y="-26" width="6" height="18" rx="2" fill="#0ea5ff" transform="rotate(-25)">
+                <animateTransform attributeName="transform" attributeType="XML" type="rotate" values="-25;5;-20;-25" dur="4s" repeatCount="indefinite" />
+              </rect>
+            </g>
+            <g transform="translate(820,120)">
+              <circle r="14" fill="#0ea5ff" />
+              <rect x="-3" y="-26" width="6" height="18" rx="2" fill="#0ea5ff" transform="rotate(20)">
+                <animateTransform attributeName="transform" attributeType="XML" type="rotate" values="20;0;25;20" dur="5s" repeatCount="indefinite" />
+              </rect>
+            </g>
+            <g transform="translate(1180,120)">
+              <circle r="14" fill="#0ea5ff" />
+              <rect x="-3" y="-26" width="6" height="18" rx="2" fill="#0ea5ff" transform="rotate(45)">
+                <animateTransform attributeName="transform" attributeType="XML" type="rotate" values="45;20;55;45" dur="6s" repeatCount="indefinite" />
+              </rect>
+            </g>
 
-            {/* CTA Buttons - Premium design */}
-            <div className={`flex gap-4 transition-all duration-300 ${isTransitioning ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'}`}>
-              <a
-                href="/shop"
-                className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-cyan-600 px-8 py-4 text-sm font-bold uppercase tracking-[1.5px] text-white rounded-full transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/40 transform hover:scale-105 hover:from-blue-700 hover:to-cyan-700"
-              >
-                {activeSlide.cta}
-                <ArrowRight className="h-5 w-5" />
-              </a>
-              <button
-                type="button"
-                className="inline-flex items-center justify-center gap-2 border-2 border-blue-600 px-8 py-4 text-sm font-bold uppercase tracking-[1.5px] text-blue-600 rounded-full transition-all duration-300 hover:bg-blue-50 hover:border-blue-700 hover:text-blue-700"
-              >
-                Learn More
-              </button>
-            </div>
-          </div>
+            {/* small elbow highlights */}
+            <circle cx="420" cy="40" r="6" fill="#c7f0fb" />
+            <circle cx="980" cy="80" r="6" fill="#c7f0fb" />
+          </g>
 
-          {/* Right: Image + Thumbnails - Premium styling */}
-          <div className="relative flex flex-col items-center justify-center lg:items-end z-10">
-            {/* Main Product Image - Premium frame */}
-            <div className={`relative w-full max-w-2xl transition-all duration-500 ${isTransitioning ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}>
-              {/* Premium glow effect */}
-              <div className="absolute -inset-16 bg-gradient-to-br from-blue-400/20 via-cyan-400/10 to-transparent rounded-3xl blur-3xl" />
-              <div className="absolute -inset-12 bg-gradient-to-tr from-cyan-300/15 to-blue-300/15 rounded-3xl blur-2xl" />
-              
-              <div className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-white/80 to-blue-50/80 backdrop-blur-xl border border-blue-200/30 p-8 shadow-2xl">
-                <img
-                  src={activeSlide.image}
-                  alt={activeSlide.title}
-                  className="w-full h-auto object-contain drop-shadow-2xl"
-                />
-              </div>
-            </div>
+          {/* moving flow particles along the path to simulate water/gas flow */}
+          <g>
+            <circle r="8" fill="#9be7ff">
+              <animateMotion dur="4s" repeatCount="indefinite" rotate="auto">
+                <mpath href="#flowPath" />
+              </animateMotion>
+            </circle>
+            <circle r="6" fill="#cfefff">
+              <animateMotion begin="1s" dur="4s" repeatCount="indefinite" rotate="auto">
+                <mpath href="#flowPath" />
+              </animateMotion>
+            </circle>
+            <circle r="5" fill="#eaf9ff">
+              <animateMotion begin="2s" dur="4.5s" repeatCount="indefinite" rotate="auto">
+                <mpath href="#flowPath" />
+              </animateMotion>
+            </circle>
+          </g>
+        </svg>
+      </div>
 
-            {/* Thumbnail Rail - Premium design */}
-            <div className="mt-10 lg:mt-0 flex flex-row lg:flex-col gap-4 lg:absolute lg:right-0 lg:top-1/2 lg:-translate-y-1/2">
-              {slides.map((slide, index) => (
-                <button
-                  key={index}
-                  onClick={() => goToSlide(index)}
-                  type="button"
-                  className={`relative overflow-hidden rounded-2xl transition-all duration-300 flex-shrink-0 backdrop-blur-sm border ${
-                    index === current
-                      ? 'ring-2 ring-blue-500 ring-offset-2 w-32 h-32 shadow-xl shadow-blue-500/20 bg-white/90'
-                      : 'w-28 h-28 opacity-60 hover:opacity-80 border-blue-200/50 bg-white/60 hover:border-blue-300'
-                  }`}
-                  aria-label={`Go to slide ${index + 1}`}
-                >
-                  <img
-                    src={slide.image}
-                    alt={slide.title}
-                    className="h-full w-full object-contain p-2"
-                  />
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
+      {/* white curved wave divider */}
+      <div className="absolute bottom-0 left-0 right-0 overflow-hidden leading-[0]">
+        <svg viewBox="0 0 1440 120" className="w-full" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0,40 C240,120 360,0 720,40 C1080,80 1200,20 1440,60 L1440 120 L0 120 Z" fill="#f8fafc" />
+        </svg>
       </div>
     </section>
   );

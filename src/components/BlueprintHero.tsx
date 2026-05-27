@@ -1,6 +1,7 @@
 import { ArrowRight, Phone, Globe, Instagram, Facebook, Linkedin, Twitter, Youtube } from "lucide-react";
 import blueprintBg from "@/assets/3d-assets/blueprint.png";
 import pipeFittings from "@/assets/3d-assets/pipe_fittings.png";
+import pipeSet from "@/assets/3d-assets/pipe_set.png";
 
 const BlueprintHero = () => {
   return (
@@ -57,13 +58,27 @@ const BlueprintHero = () => {
 
           {/* Right Product Image */}
           <div className="lg:col-span-7 relative flex justify-center lg:justify-end">
-            <div className="relative w-full max-w-[700px] animate-float">
-              <div className="absolute inset-0 bg-white/20 blur-[120px] rounded-full scale-75" />
-              <img
-                src={pipeFittings}
-                alt="SWR Pipe Fittings"
-                className="w-full h-auto relative z-10 drop-shadow-[0_35px_35px_rgba(0,0,0,0.5)]"
-              />
+            <div className="relative w-full max-w-[700px] select-none">
+              {/* Back ambient glows */}
+              <div className="absolute inset-0 bg-white/25 blur-[120px] rounded-full scale-75 z-0" />
+              
+              {/* Main SWR Fittings Image */}
+              <div className="relative z-10 animate-float-slow">
+                <img
+                  src={pipeFittings}
+                  alt="SWR Pipe Fittings"
+                  className="w-full h-auto drop-shadow-[0_30px_50px_rgba(0,0,0,0.45)] hover:scale-[1.01] transition-transform duration-500"
+                />
+              </div>
+
+              {/* Dynamic 3D Pipe Image overlapping on the side! */}
+              <div className="absolute -left-12 -bottom-10 w-[55%] z-20 animate-float-delayed">
+                <img
+                  src={pipeSet}
+                  alt="3D SWR Pipe Set"
+                  className="w-full h-auto drop-shadow-[0_25px_35px_rgba(0,0,0,0.55)] hover:scale-105 transition-transform duration-500"
+                />
+              </div>
             </div>
 
             {/* Social Floating Icons */}

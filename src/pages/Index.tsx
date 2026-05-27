@@ -2,12 +2,14 @@ import { useEffect, useState } from "react";
 import TopBar from "@/components/TopBar";
 import Header from "@/components/Header";
 import IndustrialVideoHero from "../components/IndustrialVideoHero";
+import HeroSlider from "../components/HeroSlider";
 import FeaturesBar from "@/components/FeaturesBar";
 import InnovativeProducts from "@/components/InnovativeProducts";
 import FeaturedProducts from "@/components/FeaturedProducts";
 import PopularProducts from "@/components/PopularProducts";
 import PromoBanners from "@/components/PromoBanners";
 import StatsCounter from "@/components/StatsCounter";
+import OurBrands from "@/components/OurBrands";
 import Testimonials from "@/components/Testimonials";
 import CtaBanner from "@/components/CtaBanner";
 import Footer from "@/components/Footer";
@@ -38,10 +40,10 @@ const Index = () => {
       <TopBar />
       <Header />
       <main className="relative">
-          <div data-reveal="up">
-            <IndustrialVideoHero />
-          </div>
-          {/* Ambient background mesh */}
+        <div data-reveal="up">
+          <HeroSlider />
+        </div>
+        {/* Ambient background mesh */}
         <div
           className="fixed inset-0 pointer-events-none z-0"
           style={{
@@ -53,7 +55,7 @@ const Index = () => {
           }}
         />
 
-      
+
         <div data-reveal="up" data-reveal-delay="70">
           <FeaturesBar />
         </div>
@@ -68,6 +70,9 @@ const Index = () => {
         </div>
         <div data-reveal="zoom" data-reveal-delay="170">
           <StatsCounter />
+        </div>
+        <div data-reveal="up" data-reveal-delay="180">
+          <OurBrands />
         </div>
         <div data-reveal="right" data-reveal-delay="190">
           <Testimonials />

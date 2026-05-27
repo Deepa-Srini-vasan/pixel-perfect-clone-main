@@ -19,6 +19,7 @@ const ProductCard = memo(({ image, name, slug, category, shortDescription }: Pro
 
   return (
     <article
+      data-testid={`product-card-${slug}`}
       className="
         group relative flex flex-col w-full bg-white
         rounded-2xl overflow-hidden
@@ -49,6 +50,7 @@ const ProductCard = memo(({ image, name, slug, category, shortDescription }: Pro
           alt={name}
           loading="lazy"
           decoding="async"
+          data-testid="product-image"
           className="
             absolute inset-0 w-full h-full
             object-contain p-8
@@ -73,6 +75,7 @@ const ProductCard = memo(({ image, name, slug, category, shortDescription }: Pro
         {/* Product name */}
         <Link
           to={link}
+          data-testid="product-name"
           className="
             font-bold text-[15px] leading-snug text-slate-900
             hover:text-blue-600 transition-colors duration-200
@@ -90,6 +93,7 @@ const ProductCard = memo(({ image, name, slug, category, shortDescription }: Pro
         {/* CTA */}
         <Link
           to={link}
+          data-testid="view-product-btn"
           className="
             mt-4 inline-flex items-center justify-center gap-2
             w-full px-5 py-3 rounded-xl

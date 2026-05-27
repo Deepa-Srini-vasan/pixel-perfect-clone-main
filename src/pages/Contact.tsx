@@ -51,7 +51,7 @@ const Contact = () => {
         {/* Google Map */}
         <div className="w-full h-[500px] bg-muted">
           <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3911.5!2d77.8673461!3d11.4895526!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ba95e4784d49ce5%3A0xb43852a024c02059!2sSakkthi%20Polymers!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3909.866346914575!2d77.8698533!3d11.489564799999998!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ba95fbb4b00ffc9%3A0x25efcea40a0cd6c4!2sEUROAQUA%20PLUMTEK%20PVT%20LTD!5e0!3m2!1sen!2sin!4v1779788597579!5m2!1sen!2sin"
             width="100%"
             height="100%"
             style={{ border: 0 }}

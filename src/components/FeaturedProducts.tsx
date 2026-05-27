@@ -29,7 +29,7 @@ const FeaturedProducts = () => {
       return categoriesList.slice(0, 5).map((cat, i) => ({
         rawName: cat.name,
         name: normalizeCategoryName(cat.name),
-        image: categoryImageLookup[cat.name] ?? categoryImageLookup.Hoses,
+        image: categoryImageLookup.get(cat.name) ?? categoryImageLookup.get("Hoses"),
         featured: i === 0,
       }));
     }
@@ -37,7 +37,7 @@ const FeaturedProducts = () => {
     return unique.slice(0, 5).map((cat, i) => ({
       rawName: cat,
       name: normalizeCategoryName(cat),
-      image: categoryImageLookup[cat] ?? categoryImageLookup.Hoses,
+      image: categoryImageLookup.get(cat) ?? categoryImageLookup.get("Hoses"),
       featured: i === 0,
     }));
   }, [categoriesList, products]);
@@ -45,7 +45,7 @@ const FeaturedProducts = () => {
   const featured = categoryCards[0] ?? {
     rawName: "Products",
     name: "Industrial Products",
-    image: categoryImageLookup.Hoses,
+    image: categoryImageLookup.get("Hoses"),
     featured: true,
   };
   const others = categoryCards.slice(1);
@@ -94,7 +94,7 @@ const FeaturedProducts = () => {
           variants={containerVariants}
           initial="hidden"
           animate={inView ? "show" : "hidden"}
-          className="grid grid-cols-1 lg:grid-cols-3 lg:grid-rows-2 gap-5 auto-rows-auto"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 lg:grid-rows-2 gap-5 auto-rows-auto"
         >
           {/* Large featured card – spans 2 rows */}
           <motion.div

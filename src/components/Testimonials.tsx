@@ -97,7 +97,7 @@ const Testimonials = () => {
                 {/* Stars */}
                 <div className="flex items-center justify-center gap-1 mb-6">
                   {Array.from({ length: testimonials[active].rating }).map((_, i) => (
-                    <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />
+                    <Star key={i} className="w-5 h-5 fill-blue-400 text-blue-400" />
                   ))}
                 </div>
 
