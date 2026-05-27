@@ -5,7 +5,7 @@ import HTMLFlipBook from "react-pageflip";
 import { motion, AnimatePresence } from "framer-motion";
 
 // Set up PDF.js worker
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+pdfjs.GlobalWorkerOptions.workerSrc = '//unpkg.com/pdfjs-dist@5.4.296/build/pdf.worker.min.mjs';
 
 // @ts-ignore - react-pageflip doesn't have perfect TS definitions
 const FlipBook = HTMLFlipBook as any;
