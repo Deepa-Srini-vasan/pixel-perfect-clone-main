@@ -1,13 +1,11 @@
 import { useEffect, useState } from "react";
 import TopBar from "@/components/TopBar";
 import Header from "@/components/Header";
-import IndustrialVideoHero from "../components/IndustrialVideoHero";
 import HeroSlider from "../components/HeroSlider";
 import FeaturesBar from "@/components/FeaturesBar";
 import InnovativeProducts from "@/components/InnovativeProducts";
 import FeaturedProducts from "@/components/FeaturedProducts";
 import PopularProducts from "@/components/PopularProducts";
-import PromoBanners from "@/components/PromoBanners";
 import StatsCounter from "@/components/StatsCounter";
 import OurBrands from "@/components/OurBrands";
 import Testimonials from "@/components/Testimonials";
