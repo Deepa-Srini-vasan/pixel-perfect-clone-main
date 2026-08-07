@@ -55,113 +55,135 @@ const FeaturedProducts = () => {
     show: { transition: { staggerChildren: 0.1 } },
   };
   const cardVariants = {
-    hidden: { opacity: 0, y: 28 },
-    show:   { opacity: 1, y: 0, transition: { duration: 0.7, ease } },
+    hidden: { opacity: 0, y: 20 },
+    show:   { opacity: 1, y: 0, transition: { duration: 0.5, ease } },
   };
 
   return (
-    <section ref={ref} className="py-24 lg:py-32 bg-white" aria-label="Featured categories">
-      <div className="container-pipes">
+    <section ref={ref} className="py-10 sm:py-16 lg:py-24 bg-white text-left" aria-label="Featured categories">
+      <div className="container mx-auto px-4 sm:px-6 max-w-7xl">
 
         {/* ── Section header ── */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.7, ease }}
-          className="mb-14 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4"
+          transition={{ duration: 0.6, ease }}
+          className="mb-6 sm:mb-12 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3"
         >
           <div>
-            <p className="text-[11px] font-black uppercase tracking-[0.2em] text-blue-600 mb-3">
-              Top-Rated Categories
-            </p>
-            <h2 className="font-heading font-bold text-slate-900 leading-tight tracking-tight"
-              style={{ fontSize: "clamp(1.75rem, 3.5vw, 2.75rem)" }}
-            >
+            <div className="inline-flex items-center gap-2 mb-2">
+              <span className="w-5 h-[2px] bg-blue-600" />
+              <p className="text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] text-blue-600">
+                Top-Rated Categories
+              </p>
+            </div>
+            <h2 className="font-heading font-bold text-slate-900 leading-tight tracking-tight text-2xl sm:text-4xl lg:text-[44px]">
               Choose the Category<br className="hidden sm:block" /> You're Interested In
             </h2>
           </div>
           <Link
             to="/shop"
-            className="inline-flex items-center gap-2 text-[13px] font-bold text-blue-600 hover:text-blue-700 group shrink-0"
+            className="inline-flex items-center gap-1.5 text-xs sm:text-[13px] font-bold text-blue-600 hover:text-blue-700 group shrink-0"
           >
             View All Products
             <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
           </Link>
         </motion.div>
 
-        {/* ── Category Grid ── */}
+        {/* ── Category Grid - 2 columns on mobile ── */}
         <motion.div
           variants={containerVariants}
           initial="hidden"
           animate={inView ? "show" : "hidden"}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 lg:grid-rows-2 gap-5 auto-rows-auto"
+          className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 lg:grid-rows-2 gap-3 sm:gap-5 auto-rows-auto"
         >
-          {/* Large featured card – spans 2 rows */}
+          {/* Large featured card – spans 2 cols on mobile, 2 rows on desktop */}
           <motion.div
             variants={cardVariants}
-            className="lg:col-span-1 lg:row-span-2 group relative rounded-3xl overflow-hidden
-                       bg-slate-50 border border-slate-100 hover:border-blue-100
-                       shadow-[0_2px_12px_rgba(15,23,42,0.04)]
-                       hover:shadow-[0_24px_60px_rgba(15,23,42,0.1)]
-                       transition-all duration-500 flex flex-col min-h-[420px]"
+            className="col-span-2 md:col-span-1 lg:col-span-1 lg:row-span-2 group relative rounded-2xl sm:rounded-3xl overflow-hidden
+                       bg-gradient-to-b from-[#0f2b66] via-[#12337a] to-[#0a1c42] border border-blue-900/50
+                       hover:border-blue-400/50 shadow-lg hover:shadow-2xl transition-all duration-500 flex flex-col min-h-[220px] sm:min-h-[440px]"
           >
+            {/* SVG Background Pattern */}
+            <svg className="absolute inset-0 w-full h-full text-blue-300/10 pointer-events-none" viewBox="0 0 200 200" fill="none" stroke="currentColor" strokeWidth="0.8">
+              <pattern id="hex-cat-main" width="30" height="51.96" patternUnits="userSpaceOnUse">
+                <path d="M15 0 L30 8.66 L30 25.98 L15 34.64 L0 25.98 L0 8.66 Z M15 25.98 L30 34.64 L30 51.96 L15 60.62 L0 51.96 L0 34.64 Z" />
+              </pattern>
+              <rect width="100%" height="100%" fill="url(#hex-cat-main)" />
+            </svg>
+
+            {/* Glowing Blue Radial Backdrop */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div className="w-48 h-48 sm:w-64 sm:h-64 rounded-full bg-blue-500/20 blur-3xl" />
+            </div>
+
             {/* Image */}
-            <div className="flex-1 flex items-center justify-center p-10 pt-12">
+            <div className="flex-1 flex items-center justify-center p-4 sm:p-10 pt-6 sm:pt-12 relative z-10">
               <img
                 src={featured.image}
                 alt={featured.name}
                 loading="lazy"
                 decoding="async"
-                className="w-full max-h-[400px] object-contain
-                           transition-transform duration-700 ease-out
-                           group-hover:scale-110"
+                className="w-full max-h-[160px] sm:max-h-[380px] object-contain drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)]
+                           transition-transform duration-700 ease-out group-hover:scale-110"
               />
             </div>
 
             {/* Caption */}
-            <div className="p-8 border-t border-slate-100 bg-white">
-              <p className="text-[10px] font-black uppercase tracking-[0.18em] text-blue-600 mb-1.5">
+            <div className="p-4 sm:p-8 border-t border-white/10 bg-white/5 backdrop-blur-md relative z-10">
+              <p className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.18em] text-cyan-300 mb-0.5 sm:mb-1">
                 Featured Category
               </p>
-              <h3 className="font-heading font-bold text-slate-900 text-2xl mb-4 group-hover:text-blue-600 transition-colors">
+              <h3 className="font-heading font-bold text-white text-base sm:text-2xl mb-2 sm:mb-4 group-hover:text-cyan-300 transition-colors">
                 {featured.name}
               </h3>
               <Link
                 to="/shop"
-                className="inline-flex items-center gap-2.5 text-[13px] font-bold uppercase tracking-[0.1em] text-slate-700 hover:text-blue-600 group/link transition-colors"
+                className="inline-flex items-center gap-2 text-[11px] sm:text-[13px] font-extrabold uppercase tracking-[0.1em] text-sky-300 hover:text-white group/link transition-colors"
               >
                 Shop Now
-                <ArrowRight className="w-4 h-4 transition-transform group-hover/link:translate-x-1.5" />
+                <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform group-hover/link:translate-x-1.5" />
               </Link>
             </div>
           </motion.div>
 
-          {/* 4 smaller cards */}
+          {/* 4 smaller cards - 2 column grid on mobile */}
           {others.map((cat) => (
             <motion.div key={cat.rawName} variants={cardVariants}>
               <Link
                 to="/shop"
-                className="group flex flex-col h-full rounded-3xl overflow-hidden
-                           bg-slate-50 border border-slate-100 hover:border-blue-100
-                           shadow-[0_2px_8px_rgba(15,23,42,0.04)]
-                           hover:shadow-[0_16px_48px_rgba(15,23,42,0.1)]
-                           transition-all duration-500 hover:-translate-y-1"
+                className="group flex flex-col h-full rounded-2xl sm:rounded-3xl overflow-hidden relative
+                           bg-gradient-to-b from-[#0f2b66] via-[#12337a] to-[#0a1c42] border border-blue-900/50
+                           hover:border-blue-400/50 shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-1"
               >
-                <div className="flex-1 flex items-center justify-center min-h-[180px] p-8">
+                {/* SVG Background Pattern */}
+                <svg className="absolute inset-0 w-full h-full text-blue-300/10 pointer-events-none" viewBox="0 0 200 200" fill="none" stroke="currentColor" strokeWidth="0.8">
+                  <pattern id={`hex-cat-${cat.rawName}`} width="30" height="51.96" patternUnits="userSpaceOnUse">
+                    <path d="M15 0 L30 8.66 L30 25.98 L15 34.64 L0 25.98 L0 8.66 Z M15 25.98 L30 34.64 L30 51.96 L15 60.62 L0 51.96 L0 34.64 Z" />
+                  </pattern>
+                  <rect width="100%" height="100%" fill={`url(#hex-cat-${cat.rawName})`} />
+                </svg>
+
+                {/* Glowing Backdrop */}
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <div className="w-24 h-24 sm:w-36 sm:h-36 rounded-full bg-blue-500/15 blur-xl" />
+                </div>
+
+                <div className="flex-1 flex items-center justify-center min-h-[110px] sm:min-h-[180px] p-4 sm:p-8 relative z-10">
                   <img
                     src={cat.image}
                     alt={cat.name}
                     loading="lazy"
                     decoding="async"
-                    className="max-w-[75%] max-h-[140px] object-contain
+                    className="max-w-[80%] max-h-[90px] sm:max-h-[140px] object-contain drop-shadow-[0_8px_16px_rgba(0,0,0,0.4)]
                                transition-transform duration-500 group-hover:scale-110"
                   />
                 </div>
-                <div className="px-6 py-5 border-t border-slate-100 bg-white flex items-center justify-between">
-                  <h3 className="font-heading font-bold text-slate-800 text-base group-hover:text-blue-600 transition-colors">
+                <div className="px-3.5 py-3 sm:px-6 sm:py-5 border-t border-white/10 bg-white/5 backdrop-blur-md flex items-center justify-between relative z-10">
+                  <h3 className="font-heading font-bold text-white text-xs sm:text-base group-hover:text-cyan-300 transition-colors truncate pr-1">
                     {cat.name}
                   </h3>
-                  <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-blue-500 transition-all group-hover:translate-x-1" />
+                  <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-sky-300 group-hover:text-white transition-all group-hover:translate-x-1 shrink-0" />
                 </div>
               </Link>
             </motion.div>

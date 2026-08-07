@@ -3,16 +3,20 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import ScrollToTop from "./components/ScrollToTop";
 import FloatingButtons from "./components/FloatingButtons";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/admin/ProtectedRoute";
+import { trackPageView } from "./lib/analytics";
+import { applySeo } from "./lib/seo";
 
 // Lazy Loaded Routes for Performance
 const Index = lazy(() => import("./pages/Index"));
 const About = lazy(() => import("./pages/About"));
 const Contact = lazy(() => import("./pages/Contact"));
+const Careers = lazy(() => import("./pages/Careers"));
+const Clients = lazy(() => import("./pages/Clients"));
 const Shop = lazy(() => import("./pages/Shop"));
 const ProductDetails = lazy(() => import("./pages/ProductDetails"));
 const Catalogs = lazy(() => import("./pages/Catalogs"));
@@ -25,10 +29,14 @@ const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
 const AdminProducts = lazy(() => import("./pages/admin/AdminProducts"));
 const AdminEnquiries = lazy(() => import("./pages/AdminEnquiries"));
 const AdminCategories = lazy(() => import("./pages/admin/AdminCategories"));
+const AdminSubCategories = lazy(() => import("./pages/admin/AdminSubCategories"));
 const AdminInventory = lazy(() => import("./pages/admin/AdminInventory"));
 const AdminSettings = lazy(() => import("./pages/admin/AdminSettings"));
 const AdminActivityLogs = lazy(() => import("./pages/admin/AdminActivityLogs"));
 const AdminUsers = lazy(() => import("./pages/admin/AdminUsers"));
+const AdminCareers = lazy(() => import("./pages/admin/AdminCareers"));
+const AdminClients = lazy(() => import("./pages/admin/AdminClients"));
+const AdminTestimonials = lazy(() => import("./pages/admin/AdminTestimonials"));
 
 const PageLoader = () => (
   <div className="min-h-screen w-full flex flex-col items-center justify-center bg-slate-50/50">
@@ -50,6 +58,11 @@ const AppShell = () => {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith("/admin");
 
+  useEffect(() => {
+    trackPageView(location.pathname);
+    applySeo(location.pathname);
+  }, [location.pathname]);
+
   return (
     <>
       <ScrollToTop />
@@ -58,6 +71,8 @@ const AppShell = () => {
           <Route path="/" element={<Index />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/careers" element={<Careers />} />
+          <Route path="/clients" element={<Clients />} />
           <Route path="/shop" element={<Shop />} />
           <Route path="/catalogs" element={<Catalogs />} />
           <Route path="/product/:slug" element={<ProductDetails />} />
@@ -68,10 +83,14 @@ const AppShell = () => {
               <Route path="products" element={<AdminProducts />} />
               <Route path="enquiries" element={<AdminEnquiries />} />
               <Route path="categories" element={<AdminCategories />} />
+              <Route path="subcategories" element={<AdminSubCategories />} />
               <Route path="inventory" element={<AdminInventory />} />
               <Route path="settings" element={<AdminSettings />} />
               <Route path="activity-logs" element={<AdminActivityLogs />} />
               <Route path="users" element={<AdminUsers />} />
+              <Route path="careers" element={<AdminCareers />} />
+              <Route path="clients" element={<AdminClients />} />
+              <Route path="testimonials" element={<AdminTestimonials />} />
             </Route>
           </Route>
           <Route path="*" element={<NotFound />} />

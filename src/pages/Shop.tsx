@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronDown, Search, X, Filter, LayoutGrid, ChevronLeft, ChevronRight, ListTree, TrendingUp, ArrowDownUp, Droplet, Wrench, Layers, Package } from "lucide-react";
@@ -8,8 +8,101 @@ import Footer from "@/components/Footer";
 import PageBanner from "@/components/PageBanner";
 import ProductCard from "@/components/ProductCard";
 import { fetchCategories, fetchProducts, type ApiProduct, type PaginatedProductsResponse } from "@/lib/api";
+import type { Category } from "@/lib/category";
 import { categoryImageLookup, resolveProductImage, normalizeCategoryName } from "@/lib/catalog-assets";
+import { buildCategoryTree, type CategoryTreeItem } from "@/lib/category-tree";
 import { motion, AnimatePresence } from "framer-motion";
+
+const CategoryButton = ({
+  category,
+  depth,
+  activeCategory,
+  categoryCount,
+  onSelect,
+  isExpanded,
+  onToggle,
+  expandedCategoryIds,
+}: {
+  category: CategoryTreeItem;
+  depth: number;
+  activeCategory: string;
+  categoryCount: (category: string) => number;
+  onSelect: (category: string) => void;
+  isExpanded: boolean;
+  onToggle: (categoryId: number) => void;
+  expandedCategoryIds: Set<number>;
+}) => {
+  const hasChildren = category.children.length > 0;
+
+  return (
+    <>
+      <div
+        onClick={() => {
+          onSelect(category.category.name);
+          if (hasChildren) {
+            onToggle(category.category.id);
+          }
+        }}
+        className={`group flex w-full cursor-pointer items-center justify-between rounded-xl px-3 py-2.5 text-sm transition-all duration-300 ${
+          activeCategory === category.category.name
+            ? "bg-blue-600 text-white shadow-md shadow-blue-600/20 font-semibold"
+            : "text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-medium"
+        }`}
+        style={{ paddingLeft: `${depth * 1.25}rem` }}
+      >
+        <button
+          onClick={(event) => {
+            event.stopPropagation();
+            onSelect(category.category.name);
+          }}
+          type="button"
+          className="flex-1 text-left"
+        >
+          <div className="flex items-center gap-2.5 overflow-hidden">
+            {getCategoryIcon(category.category.name, activeCategory === category.category.name)}
+            <span className="truncate pr-2">{normalizeCategoryName(category.category.name)}</span>
+          </div>
+        </button>
+
+        <div className="flex items-center gap-2">
+          <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${
+            activeCategory === category.category.name ? "bg-white/20 text-white" : "bg-slate-100 text-slate-500"
+          }`}>
+            {categoryCount(category.category.name) ?? 0}
+          </span>
+          {hasChildren ? (
+            <button
+              type="button"
+              onClick={(event) => {
+                event.stopPropagation();
+                onToggle(category.category.id);
+              }}
+              className={`rounded-full p-1 transition-transform ${isExpanded ? "rotate-180" : ""}`}
+              aria-label={isExpanded ? "Collapse subcategories" : "Expand subcategories"}
+            >
+              <ChevronDown className="h-4 w-4 text-slate-500" />
+            </button>
+          ) : null}
+        </div>
+      </div>
+      {hasChildren && isExpanded
+        ? category.children.map((child) => (
+            <CategoryButton
+              key={child.category.id}
+              category={child}
+              depth={depth + 1}
+              activeCategory={activeCategory}
+              categoryCount={categoryCount}
+              onSelect={onSelect}
+              isExpanded={expandedCategoryIds.has(child.category.id)}
+              onToggle={onToggle}
+              expandedCategoryIds={expandedCategoryIds}
+            />
+          ))
+        : null}
+    </>
+  );
+};
 
 const getCategoryIcon = (category: string, isActive: boolean) => {
   const iconClass = `w-4 h-4 shrink-0 transition-colors ${isActive ? 'text-white/80' : 'text-slate-400 group-hover:text-blue-500'}`;
@@ -31,6 +124,7 @@ const Shop = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [expandedCategoryIds, setExpandedCategoryIds] = useState<Set<number>>(new Set());
 
   const location = useLocation();
 
@@ -50,16 +144,15 @@ const Shop = () => {
     return () => { document.body.style.overflow = "unset"; };
   }, [mobileFilterOpen]);
 
-  /* ── Server-side paginated query ── */
   const { data, isLoading: productsLoading } = useQuery({
     queryKey: ["shop-products", activeCategory, searchQuery, sortBy, currentPage] as const,
-    queryFn:  (): Promise<PaginatedProductsResponse> => fetchProducts(
-      searchQuery,
-      activeCategory === "All categories" ? "" : activeCategory,
-      currentPage,
-      LIMIT,
-      sortBy,
-    ),
+    queryFn: () => fetchProducts({
+      search: searchQuery || undefined,
+      category: activeCategory === "All categories" ? undefined : activeCategory,
+      page: currentPage,
+      limit: LIMIT,
+      sort: sortBy as any,
+    }),
     placeholderData: (prev: PaginatedProductsResponse | undefined) => prev,
     staleTime: 1000 * 60 * 2,
   });
@@ -74,7 +167,22 @@ const Shop = () => {
   const total         = data?.total         ?? 0;
   const totalPages    = data?.totalPages    ?? 1;
   const categoryEntries = categoriesData?.categories ?? [];
-  const categories    = ["All categories", ...categoryEntries.map((e) => e.name)];
+
+  const categoryTree = useMemo(() => buildCategoryTree(categoryEntries as Category[]), [categoryEntries]);
+
+  const toggleCategoryExpansion = (categoryId: number) => {
+    setExpandedCategoryIds((current) => {
+      const next = new Set(current);
+      if (next.has(categoryId)) {
+        next.delete(categoryId);
+      } else {
+        next.add(categoryId);
+      }
+      return next;
+    });
+  };
+
+  const categories = ["All categories", ...categoryEntries.map((e) => e.name)];
 
   /* ── Category counts come from server categories endpoint ── */
   const categoryCount = useCallback((cat: string) => {
@@ -115,7 +223,14 @@ const Shop = () => {
     <div className="min-h-screen bg-slate-50/50 flex flex-col">
       <TopBar />
       <Header />
-      <PageBanner title="Shop" breadcrumbs={[{ label: "Home", to: "/" }, { label: "Shop" }]} />
+      <PageBanner
+        title="Plumtek Product Store"
+        eyebrow="OFFICIAL CATALOG STORE"
+        subtitle="Explore our full collection of PPR pipes, fittings, faucets, hoses, and industrial valves. Filter by category, price, and technical specs."
+        breadcrumbs={[{ label: "Home", to: "/" }, { label: "Store" }]}
+        ctaText="GO TO CATALOGUE"
+        ctaLink="/catalogs"
+      />
       
       <main className="flex-1">
         <section className="py-8 md:py-12">
@@ -231,27 +346,38 @@ const Shop = () => {
                     <div className="mb-8">
                       <h3 className="mb-4 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.15em] text-slate-400"><ListTree className="w-3.5 h-3.5 text-blue-500/70" /> Categories</h3>
                       <div className="space-y-1.5">
-                        {categories.map((category) => (
-                          <button
-                            key={category}
-                            onClick={() => setActiveCategory(category)}
-                            type="button"
-                            className={`group flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-sm transition-all duration-300 ${
-                              activeCategory === category 
-                                ? "bg-blue-600 text-white shadow-md shadow-blue-600/20 font-semibold transform scale-[1.02]" 
-                                : "text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-medium"
-                            }`}
-                          >
-                            <div className="flex items-center gap-2.5 overflow-hidden">
-                              {getCategoryIcon(category, activeCategory === category)}
-                              <span className="truncate pr-2">{category === "All categories" ? "All Products" : normalizeCategoryName(category)}</span>
-                            </div>
-                            <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${
-                              activeCategory === category ? "bg-white/20 text-white" : "bg-slate-100 text-slate-500"
-                            }`}>
-                              {categoryCount(category) ?? 0}
-                            </span>
-                          </button>
+                        <button
+                          key="all-categories"
+                          onClick={() => setActiveCategory("All categories")}
+                          type="button"
+                          className={`group flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-sm transition-all duration-300 ${
+                            activeCategory === "All categories"
+                              ? "bg-blue-600 text-white shadow-md shadow-blue-600/20 font-semibold transform scale-[1.02]"
+                              : "text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-medium"
+                          }`}
+                        >
+                          <div className="flex items-center gap-2.5 overflow-hidden">
+                            {getCategoryIcon("All categories", activeCategory === "All categories")}
+                            <span className="truncate pr-2">All Products</span>
+                          </div>
+                          <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${
+                            activeCategory === "All categories" ? "bg-white/20 text-white" : "bg-slate-100 text-slate-500"
+                          }`}>
+                            {total}
+                          </span>
+                        </button>
+                        {categoryTree.map((category) => (
+                          <CategoryButton
+                            key={category.category.id}
+                            category={category}
+                            depth={0}
+                            activeCategory={activeCategory}
+                            categoryCount={categoryCount}
+                            onSelect={setActiveCategory}
+                            isExpanded={expandedCategoryIds.has(category.category.id)}
+                            onToggle={toggleCategoryExpansion}
+                            expandedCategoryIds={expandedCategoryIds}
+                          />
                         ))}
                       </div>
                     </div>
@@ -271,6 +397,8 @@ const Shop = () => {
                               <img
                                 src={categoryImageLookup.get(category.name) ?? categoryImageLookup.get("Hoses")}
                                 alt={normalizeCategoryName(category.name)}
+                                loading="lazy"
+                                decoding="async"
                                 className="h-full w-full object-contain transition-transform duration-500 group-hover:scale-110 mix-blend-multiply"
                               />
                             </div>
@@ -355,21 +483,37 @@ const Shop = () => {
 
                         <div>
                           <label className="mb-3 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.15em] text-slate-400"><ListTree className="w-3.5 h-3.5 text-blue-500/70" /> Categories</label>
-                          <div className="flex flex-wrap gap-2">
-                            {categories.map((category) => (
-                              <button
-                                key={category}
-                                onClick={() => setActiveCategory(category)}
-                                type="button"
-                                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
-                                  activeCategory === category 
-                                    ? "bg-blue-600 text-white shadow-md shadow-blue-600/20" 
-                                    : "bg-slate-50 border border-slate-200 text-slate-600"
-                                }`}
-                              >
-                                {getCategoryIcon(category, activeCategory === category)}
-                                {category === "All categories" ? "All Products" : normalizeCategoryName(category)}
-                              </button>
+                          <div className="space-y-2">
+                            <button
+                              key="all-categories-mobile"
+                              onClick={() => setActiveCategory("All categories")}
+                              type="button"
+                              className={`flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors ${
+                                activeCategory === "All categories"
+                                  ? "bg-blue-600 text-white shadow-md shadow-blue-600/20"
+                                  : "bg-slate-50 border border-slate-200 text-slate-600"
+                              }`}
+                            >
+                              <div className="flex items-center gap-2">
+                                {getCategoryIcon("All categories", activeCategory === "All categories")}
+                                All Products
+                              </div>
+                              <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-500">
+                                {total}
+                              </span>
+                            </button>
+                            {categoryTree.map((category) => (
+                              <CategoryButton
+                                key={category.category.id}
+                                category={category}
+                                depth={0}
+                                activeCategory={activeCategory}
+                                categoryCount={categoryCount}
+                                onSelect={setActiveCategory}
+                                isExpanded={expandedCategoryIds.has(category.category.id)}
+                                onToggle={toggleCategoryExpansion}
+                                expandedCategoryIds={expandedCategoryIds}
+                              />
                             ))}
                           </div>
                         </div>

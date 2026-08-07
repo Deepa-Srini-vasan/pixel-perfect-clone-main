@@ -32,16 +32,16 @@ const StatItem = ({
   return (
     <div className="text-center group">
       <div
-        className="font-heading font-black text-white tabular-nums leading-none tracking-tight mb-3"
-        style={{ fontSize: "clamp(3rem, 6vw, 4.5rem)" }}
+        className="font-heading font-black text-blue-600 tabular-nums leading-none tracking-tight mb-2 sm:mb-3"
+        style={{ fontSize: "clamp(2rem, 5vw, 4.5rem)" }}
       >
         {count.toLocaleString()}
-        <span className="text-blue-400 ml-1" style={{ fontSize: "0.65em" }}>{suffix}</span>
+        <span className="text-blue-500 ml-1" style={{ fontSize: "0.65em" }}>{suffix}</span>
       </div>
 
-      <div className="w-8 h-[2px] bg-blue-500/40 mx-auto mb-3 group-hover:w-14 transition-all duration-500 rounded-full" />
+      <div className="w-6 sm:w-8 h-[2px] bg-blue-600/40 mx-auto mb-2 sm:mb-3 group-hover:w-14 transition-all duration-500 rounded-full" />
 
-      <p className="text-[11px] font-black uppercase tracking-[0.18em] text-slate-400">
+      <p className="text-[10px] sm:text-[11px] font-black uppercase tracking-[0.18em] text-slate-600">
         {t(label)}
       </p>
     </div>
@@ -51,9 +51,9 @@ const StatItem = ({
 /* ─── Skeleton shimmer ───────────────────────────── */
 const StatSkeleton = () => (
   <div className="text-center">
-    <div className="h-16 w-28 bg-white/5 rounded-xl animate-pulse mx-auto mb-3" />
-    <div className="w-8 h-[2px] bg-white/10 mx-auto mb-3" />
-    <div className="h-3 w-24 bg-white/5 rounded-full animate-pulse mx-auto" />
+    <div className="h-12 sm:h-16 w-24 sm:w-28 bg-slate-100 rounded-xl animate-pulse mx-auto mb-3" />
+    <div className="w-8 h-[2px] bg-slate-200 mx-auto mb-3" />
+    <div className="h-3 w-24 bg-slate-100 rounded-full animate-pulse mx-auto" />
   </div>
 );
 
@@ -64,10 +64,9 @@ const StatsCounter = () => {
   const [isVisible, setIsVisible] = useState(false);
   useEffect(() => { if (inView) setIsVisible(true); }, [inView]);
 
-  // Fetch real total product count from API
   const { data } = useQuery({
     queryKey: ["stats-total-products"],
-    queryFn: () => fetchProducts("", "", 1, 1, "latest"),
+    queryFn: () => fetchProducts({ limit: 1 }),
     staleTime: 1000 * 60 * 10,
   });
 
@@ -88,20 +87,20 @@ const StatsCounter = () => {
   return (
     <section
       ref={ref}
-      className="relative py-28 lg:py-36 bg-slate-950 overflow-hidden"
+      className="relative py-10 sm:py-16 lg:py-24 bg-white overflow-hidden"
       aria-label={t("Company statistics")}
     >
-      {/* Ambient glow blobs */}
+      {/* Subtle light background accents */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-[500px] h-[300px] bg-blue-600/10 blur-[100px]" />
-        <div className="absolute bottom-0 right-1/4 w-[400px] h-[250px] bg-cyan-500/8 blur-[80px]" />
+        <div className="absolute top-0 left-1/4 w-[500px] h-[300px] bg-blue-100/40 blur-[100px]" />
+        <div className="absolute bottom-0 right-1/4 w-[400px] h-[250px] bg-cyan-100/30 blur-[80px]" />
       </div>
 
       {/* Border glows */}
-      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-blue-500/40 to-transparent" />
-      <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-blue-500/30 to-transparent" />
+      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-blue-200 to-transparent" />
+      <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-blue-200 to-transparent" />
 
-      <div className="relative z-10 container-pipes">
+      <div className="container mx-auto px-4 sm:px-6 max-w-7xl">
         {/* Section heading */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -109,11 +108,11 @@ const StatsCounter = () => {
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
           className="text-center mb-16"
         >
-          <p className="text-[11px] font-black uppercase tracking-[0.2em] text-blue-400 mb-4">
+          <p className="text-[11px] font-black uppercase tracking-[0.2em] text-blue-600 mb-4">
             {t('By the Numbers')}
           </p>
           <h2
-            className="font-heading font-bold text-white leading-tight tracking-tight"
+            className="font-heading font-bold text-slate-900 leading-tight tracking-tight"
             style={{ fontSize: "clamp(1.75rem, 3.5vw, 2.5rem)" }}
           >
             {t('Trusted by Thousands of')}<br className="hidden sm:block" /> {t('Industrial Professionals')}

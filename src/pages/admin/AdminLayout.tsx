@@ -1,18 +1,10 @@
 import { useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { LayoutDashboard, Package, Mail, LogOut, ShoppingBag, BarChart3, Settings, Users, Tag, Menu, X } from "lucide-react";
+import { LogOut, ShoppingBag, Menu, X } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { canAccessAdminRoute } from "@/lib/roles";
 
-const navItems = [
-  { label: "Dashboard", to: "/admin", icon: LayoutDashboard },
-  { label: "Products", to: "/admin/products", icon: Package },
-  { label: "Categories", to: "/admin/categories", icon: Tag },
-  { label: "Inventory", to: "/admin/inventory", icon: BarChart3 },
-  { label: "Enquiries", to: "/admin/enquiries", icon: Mail },
-  { label: "Activity Logs", to: "/admin/activity-logs", icon: BarChart3 },
-  { label: "Users", to: "/admin/users", icon: Users },
-  { label: "Settings", to: "/admin/settings", icon: Settings },
-];
+import { adminNavItems } from "@/config/adminNavigation";
 
 const AdminLayout = () => {
   const { user, logout } = useAuth();
@@ -23,6 +15,8 @@ const AdminLayout = () => {
     logout();
     navigate("/admin/login", { replace: true });
   };
+
+  const visibleNavItems = adminNavItems.filter((item) => canAccessAdminRoute(user?.role, item.to));
 
   return (
     <div className="min-h-screen bg-background lg:pl-[280px]">
@@ -51,21 +45,41 @@ const AdminLayout = () => {
         </div>
 
         <nav className="flex-1 px-4 pb-4 overflow-y-auto">
-          {navItems.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.to === "/admin"}
-              onClick={() => setIsMobileMenuOpen(false)}
-              className={({ isActive }) =>
-                `mb-2 flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition-colors ${
-                  isActive ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-secondary"
-                }`
-              }
-            >
-              <item.icon className="h-4 w-4" />
-              {item.label}
-            </NavLink>
+          {visibleNavItems.map((item) => (
+            <div key={item.to} className="mb-2">
+              <NavLink
+                to={item.to}
+                end={item.to === "/admin"}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className={({ isActive }) =>
+                  `mb-1 flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition-colors ${
+                    isActive ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-secondary"
+                  }`
+                }
+              >
+                <item.icon className="h-4 w-4" />
+                {item.label}
+              </NavLink>
+              {item.children?.length ? (
+                <div className="ml-8 flex flex-col gap-1">
+                  {item.children.map((child) => (
+                    <NavLink
+                      key={child.to}
+                      to={child.to}
+                      end={child.to === "/admin"}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className={({ isActive }) =>
+                        `rounded-2xl px-4 py-2 text-sm transition-colors ${
+                          isActive ? "bg-primary/10 text-primary" : "text-foreground/80 hover:bg-secondary"
+                        }`
+                      }
+                    >
+                      {child.label}
+                    </NavLink>
+                  ))}
+                </div>
+              ) : null}
+            </div>
           ))}
         </nav>
       </aside>

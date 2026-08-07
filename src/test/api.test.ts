@@ -7,6 +7,10 @@ global.fetch = vi.fn();
 describe("API Functions", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Prevent jsdom window.open errors during submitEnquiry tests.
+    if (typeof window !== "undefined") {
+      window.open = vi.fn();
+    }
   });
 
   describe("submitEnquiry", () => {

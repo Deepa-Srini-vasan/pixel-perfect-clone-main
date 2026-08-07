@@ -4,7 +4,7 @@ import path from "path";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  assetsInclude: ["**/*.JPG", "**/*.JPEG"],
+  assetsInclude: ["**/*.JPG", "**/*.JPEG", "**/*.PNG"],
   server: {
     host: "::",
     port: 8080,

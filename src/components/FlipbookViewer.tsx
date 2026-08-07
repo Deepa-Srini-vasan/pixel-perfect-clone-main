@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import { X, ZoomIn, ZoomOut, Download, Printer, Share2, ExternalLink, Bookmark, Search, ChevronLeft, ChevronRight, BookOpen } from "lucide-react";
 import { Document, Page as PdfPage, pdfjs } from "react-pdf";
 import HTMLFlipBook from "react-pageflip";
@@ -13,9 +13,9 @@ const FlipBook = HTMLFlipBook as any;
 // Local translation helper to satisfy static analysis i18n rules
 const t = (key: string) => key;
 
-const FlipPage = React.forwardRef(({ pageNumber, scale, isCover }: { pageNumber: number; scale: number; isCover?: boolean }, ref: any) => {
-  const width = 400 * scale;
-  const height = 565 * scale;
+const FlipPage = React.forwardRef(({ pageNumber, scale, isCover, pageWidth, pageHeight }: { pageNumber: number; scale: number; isCover?: boolean; pageWidth: number; pageHeight: number }, ref: any) => {
+  const width = pageWidth;
+  const height = pageHeight;
 
   return (
     <div
@@ -63,6 +63,7 @@ const FlipbookViewer = ({ catalog, onClose }: FlipbookViewerProps) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [scale, setScale] = useState(1);
   const [isError, setIsError] = useState(false);
+  const [isMobile, setIsMobile] = useState(() => typeof window !== "undefined" ? window.innerWidth < 768 : false);
   const bookRef = useRef<any>(null);
 
   // Lock body scroll
@@ -76,6 +77,48 @@ const FlipbookViewer = ({ catalog, onClose }: FlipbookViewerProps) => {
       document.body.style.overflow = "unset";
     };
   }, [catalog]);
+
+  useEffect(() => {
+    const updateViewport = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    updateViewport();
+    window.addEventListener("resize", updateViewport);
+    return () => window.removeEventListener("resize", updateViewport);
+  }, []);
+
+  useEffect(() => {
+    setCurrentPage(1);
+    setScale(1);
+    setIsError(false);
+    setNumPages(null);
+  }, [catalog?.id]);
+
+  const pageSize = useMemo(() => {
+    if (typeof window === "undefined") {
+      return { width: 320, height: 452 };
+    }
+
+    const viewportWidth = Math.max(280, window.innerWidth - (isMobile ? 32 : 96));
+    const viewportHeight = Math.max(320, window.innerHeight - (isMobile ? 180 : 240));
+
+    if (isMobile) {
+      const width = Math.min(viewportWidth, 360);
+      return {
+        width: Math.max(260, width),
+        height: Math.max(360, Math.min(viewportHeight, width * 1.414)),
+      };
+    }
+
+    const width = Math.min(viewportWidth, 400 * scale);
+    const height = Math.min(viewportHeight, 565 * scale);
+
+    return {
+      width: Math.max(280, width),
+      height: Math.max(360, height),
+    };
+  }, [isMobile, scale]);
 
   if (!catalog) return null;
 
@@ -209,31 +252,48 @@ const FlipbookViewer = ({ catalog, onClose }: FlipbookViewerProps) => {
                   </a>
                 </div>
               ) : numPages ? (
-                <FlipBook
-                  width={400 * scale}
-                  height={565 * scale}
-                  size="fixed"
-                  minWidth={300}
-                  maxWidth={800}
-                  minHeight={400}
-                  maxHeight={1200}
-                  maxShadowOpacity={0.5}
-                  showCover={true}
-                  mobileScrollSupport={true}
-                  usePortrait={true}
-                  onFlip={handlePageChange}
-                  className="mx-auto drop-shadow-2xl"
-                  ref={bookRef}
-                >
-                  {Array.from(new Array(numPages), (_, index) => (
-                    <FlipPage
-                      key={`page_${index + 1}`}
-                      pageNumber={index + 1}
-                      scale={scale}
-                      isCover={index === 0 || index === numPages - 1}
-                    />
-                  ))}
-                </FlipBook>
+                isMobile ? (
+                  <div className="w-full h-full flex flex-col items-center justify-center gap-4 overflow-auto px-2 py-2 sm:px-4">
+                    <div className="rounded-[24px] border border-white/10 bg-white p-2 shadow-[0_20px_80px_rgba(2,6,23,0.55)] max-w-full overflow-auto">
+                      <PdfPage
+                        pageNumber={currentPage}
+                        width={pageSize.width}
+                        height={pageSize.height}
+                        renderTextLayer={false}
+                        renderAnnotationLayer={false}
+                        className="select-none"
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <FlipBook
+                    width={pageSize.width}
+                    height={pageSize.height}
+                    size="fixed"
+                    minWidth={300}
+                    maxWidth={800}
+                    minHeight={400}
+                    maxHeight={1200}
+                    maxShadowOpacity={0.5}
+                    showCover={true}
+                    mobileScrollSupport={true}
+                    usePortrait={true}
+                    onFlip={handlePageChange}
+                    className="mx-auto drop-shadow-2xl"
+                    ref={bookRef}
+                  >
+                    {Array.from(new Array(numPages), (_, index) => (
+                      <FlipPage
+                        key={`page_${index + 1}`}
+                        pageNumber={index + 1}
+                        scale={scale}
+                        isCover={index === 0 || index === numPages - 1}
+                        pageWidth={pageSize.width}
+                        pageHeight={pageSize.height}
+                      />
+                    ))}
+                  </FlipBook>
+                )
               ) : null}
             </Document>
           </div>

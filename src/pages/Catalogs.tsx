@@ -6,6 +6,7 @@ import {
 import TopBar from "@/components/TopBar";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import PageBanner from "@/components/PageBanner";
 import FlipbookViewer from "@/components/FlipbookViewer";
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import catOverview  from "@/assets/catalog-covers/cat-overview.png";
@@ -206,8 +207,14 @@ const Catalogs = () => {
     <div className="min-h-screen bg-slate-50/50 flex flex-col">
       <TopBar />
       <Header />
+      <PageBanner
+        title="Plumtek Digital Library & Catalogs"
+        eyebrow="PUBLICATIONS & SPECS"
+        subtitle="Browse our interactive catalogs, technical specifications, and official price lists. View online instantly or download for offline access."
+        breadcrumbs={[{ label: "Home", to: "/" }, { label: "Catalogs" }]}
+      />
 
-      <main className="flex-1 py-16 lg:py-24 mt-8 lg:mt-12">
+      <main className="flex-1 py-12 lg:py-16">
         <div className="container-pipes">
 
           {/* ── Library Header ── */}

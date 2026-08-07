@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import TopBar from "@/components/TopBar";
 import Header from "@/components/Header";
 import HeroSlider from "../components/HeroSlider";
@@ -11,6 +11,9 @@ import OurBrands from "@/components/OurBrands";
 import Testimonials from "@/components/Testimonials";
 import CtaBanner from "@/components/CtaBanner";
 import Footer from "@/components/Footer";
+import IndustriesServed from "@/components/IndustriesServed";
+import WhyChoosePlumtek from "@/components/WhyChoosePlumtek";
+import CertificationsSection from "@/components/CertificationsSection";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 
 const Index = () => {
@@ -53,7 +56,6 @@ const Index = () => {
           }}
         />
 
-
         <div data-reveal="up" data-reveal-delay="70">
           <FeaturesBar />
         </div>
@@ -63,18 +65,37 @@ const Index = () => {
         <div data-reveal="left" data-reveal-delay="120">
           <InnovativeProducts />
         </div>
+
         <div data-reveal="up" data-reveal-delay="150">
           <PopularProducts />
         </div>
+
+        {/* ── NEW: Industries Served ── */}
+        <div data-reveal="up" data-reveal-delay="160">
+          <IndustriesServed />
+        </div>
+
         <div data-reveal="zoom" data-reveal-delay="170">
           <StatsCounter />
         </div>
+
+        {/* ── NEW: Why Choose Plumtek ── */}
+        <div data-reveal="up" data-reveal-delay="175">
+          <WhyChoosePlumtek />
+        </div>
+
         <div data-reveal="up" data-reveal-delay="180">
           <OurBrands />
         </div>
         <div data-reveal="right" data-reveal-delay="190">
           <Testimonials />
         </div>
+
+        {/* ── NEW: Certifications ── */}
+        <div data-reveal="up" data-reveal-delay="200">
+          <CertificationsSection />
+        </div>
+
         <div data-reveal="up" data-reveal-delay="220">
           <CtaBanner />
         </div>

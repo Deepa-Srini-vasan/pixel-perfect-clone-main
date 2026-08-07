@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
-import { ArrowRight, CheckCircle2, ZoomIn } from "lucide-react";
+import { ArrowRight, CheckCircle2, PlayCircle, ZoomIn, FileDown, Phone, X } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import TopBar from "@/components/TopBar";
@@ -135,7 +135,7 @@ const ProductDetails = () => {
             initial={{ opacity: 0, x: -24 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.7, ease }}
-            className="sticky top-24 bg-white rounded-3xl border border-slate-100
+            className="lg:sticky top-24 bg-white rounded-3xl border border-slate-100
                        shadow-[0_4px_32px_rgba(15,23,42,0.06)] p-8 overflow-hidden group"
           >
             <button
@@ -217,8 +217,59 @@ const ProductDetails = () => {
               </div>
             )}
 
+            {/* ── PDF Download ── */}
+            {(product as any).pdfUrl && (
+              <a
+                href={(product as any).pdfUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-2.5 border border-slate-200 bg-white
+                           text-slate-700 font-bold px-5 py-2.5 rounded-xl text-[13px] mb-4
+                           transition-all duration-200 hover:border-blue-300 hover:text-blue-700 hover:bg-blue-50"
+              >
+                <FileDown className="w-4 h-4 text-blue-600" />
+                Download Technical PDF
+              </a>
+            )}
+
+            <a
+              href={`https://wa.me/6379665268?text=${encodeURIComponent(
+                `Hi, I'm interested in ${product.name} (${product.category}). Please share details and availability.`
+              )}`}
+              onClick={() => {
+                if (typeof window !== "undefined" && (window as any).gtag) {
+                  (window as any).gtag("event", "whatsapp_inquiry_click", {
+                    event_category: "Inquiry",
+                    event_label: product.name,
+                  });
+                }
+              }}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2.5 border border-emerald-200 bg-emerald-50
+                         text-emerald-700 font-bold px-5 py-2.5 rounded-xl text-[13px] mb-6
+                         transition-all duration-200 hover:bg-emerald-100"
+            >
+              <Phone className="w-4 h-4" />
+              Ask on WhatsApp
+            </a>
+
             {/* Action buttons */}
             <div className="flex flex-wrap gap-3">
+              {product.videoUrl ? (
+                <a
+                  href={product.videoUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2.5 border border-blue-200 bg-blue-50
+                             text-blue-700 font-bold px-7 py-3.5 rounded-full text-[14px]
+                             transition-all duration-300 hover:-translate-y-0.5 hover:bg-blue-100"
+                >
+                  <PlayCircle className="w-4 h-4" />
+                  Watch Installation Video
+                </a>
+              ) : null}
+
               {/* Quote Dialog */}
               <Dialog open={isQuoteOpen} onOpenChange={setIsQuoteOpen}>
                 <DialogTrigger asChild>
@@ -235,51 +286,51 @@ const ProductDetails = () => {
                   </button>
                 </DialogTrigger>
 
-                <DialogContent className="sm:max-w-[600px]">
+                <DialogContent className="w-[92vw] sm:max-w-[600px] max-h-[85vh] overflow-y-auto p-4 sm:p-6">
                   <DialogHeader>
-                    <DialogTitle>Request a Quote</DialogTitle>
-                    <DialogDescription>
+                    <DialogTitle className="text-lg sm:text-xl font-bold">Request a Quote</DialogTitle>
+                    <DialogDescription className="text-xs sm:text-sm">
                       Submit your requirements and our team will contact you with pricing.
                     </DialogDescription>
                   </DialogHeader>
-                  <form onSubmit={handleSubmit} className="grid gap-4 mt-2">
+                  <form onSubmit={handleSubmit} className="grid gap-3.5 sm:gap-4 mt-2">
                     {/* Selected product */}
-                    <div className="rounded-xl border border-slate-100 bg-slate-50 px-4 py-3">
+                    <div className="rounded-xl border border-slate-100 bg-slate-50 px-3.5 py-2.5 sm:px-4 sm:py-3">
                       <p className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-400 mb-0.5">
                         Selected Product
                       </p>
-                      <p className="text-[14px] font-semibold text-slate-800">{product.name}</p>
+                      <p className="text-[13px] sm:text-[14px] font-semibold text-slate-800">{product.name}</p>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                       <div className="grid gap-1.5">
-                        <label className="text-[13px] font-semibold text-slate-700" htmlFor="fullName">Full Name</label>
+                        <label className="text-[12px] sm:text-[13px] font-semibold text-slate-700" htmlFor="fullName">Full Name</label>
                         <Input id="fullName" value={quoteForm.fullName} onChange={(e) => updateField("fullName", e.target.value)} placeholder="Your name" required />
                       </div>
                       <div className="grid gap-1.5">
-                        <label className="text-[13px] font-semibold text-slate-700" htmlFor="company">Company</label>
+                        <label className="text-[12px] sm:text-[13px] font-semibold text-slate-700" htmlFor="company">Company</label>
                         <Input id="company" value={quoteForm.companyName} onChange={(e) => updateField("companyName", e.target.value)} placeholder="Company name" />
                       </div>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                       <div className="grid gap-1.5">
-                        <label className="text-[13px] font-semibold text-slate-700" htmlFor="email">Email</label>
+                        <label className="text-[12px] sm:text-[13px] font-semibold text-slate-700" htmlFor="email">Email</label>
                         <Input id="email" type="email" value={quoteForm.email} onChange={(e) => updateField("email", e.target.value)} placeholder="name@company.com" required />
                       </div>
                       <div className="grid gap-1.5">
-                        <label className="text-[13px] font-semibold text-slate-700" htmlFor="phone">Phone</label>
+                        <label className="text-[12px] sm:text-[13px] font-semibold text-slate-700" htmlFor="phone">Phone</label>
                         <Input id="phone" type="tel" value={quoteForm.phone} onChange={(e) => updateField("phone", e.target.value)} placeholder="+91 ..." required />
                       </div>
                     </div>
                     <div className="grid gap-1.5">
-                      <label className="text-[13px] font-semibold text-slate-700" htmlFor="qty">Quantity</label>
+                      <label className="text-[12px] sm:text-[13px] font-semibold text-slate-700" htmlFor="qty">Quantity</label>
                       <Input id="qty" value={quoteForm.quantity} onChange={(e) => updateField("quantity", e.target.value)} placeholder="e.g. 250 units" required />
                     </div>
                     <div className="grid gap-1.5">
-                      <label className="text-[13px] font-semibold text-slate-700" htmlFor="msg">Additional Details</label>
-                      <Textarea id="msg" value={quoteForm.message} onChange={(e) => updateField("message", e.target.value)} placeholder="Specs, delivery location, timeline..." rows={4} />
+                      <label className="text-[12px] sm:text-[13px] font-semibold text-slate-700" htmlFor="msg">Additional Details</label>
+                      <Textarea id="msg" value={quoteForm.message} onChange={(e) => updateField("message", e.target.value)} placeholder="Specs, delivery location, timeline..." rows={3} />
                     </div>
                     <DialogFooter>
-                      <Button type="submit" disabled={submitting} className="w-full sm:w-auto rounded-full">
+                      <Button type="submit" disabled={submitting} className="w-full sm:w-auto rounded-full py-3 text-xs sm:text-sm font-bold bg-blue-600 hover:bg-blue-500">
                         {submitting ? "Sending…" : "Send Request"}
                       </Button>
                     </DialogFooter>

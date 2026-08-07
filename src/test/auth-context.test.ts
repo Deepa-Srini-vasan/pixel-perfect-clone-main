@@ -31,6 +31,7 @@ describe("AuthContext", () => {
       id: 1,
       email: "admin@plumtek.com",
       name: "Admin",
+      role: "admin",
     };
 
     vi.mocked(api.loginAdmin).mockResolvedValueOnce({ user: mockUser });
@@ -54,9 +55,11 @@ describe("AuthContext", () => {
       id: 1,
       email: "admin@plumtek.com",
       name: "Admin",
+      role: "admin",
     };
 
     vi.mocked(api.fetchCurrentUser).mockResolvedValueOnce({ user: mockUser });
+    vi.mocked(api.loginAdmin).mockResolvedValueOnce({ user: mockUser });
     vi.mocked(api.logoutAdmin).mockResolvedValueOnce(undefined);
 
     const { result } = renderHook(() => useAuth(), {
@@ -102,9 +105,10 @@ describe("AuthContext", () => {
       id: 1,
       email: "admin@plumtek.com",
       name: "Admin",
+      role: "admin",
     };
 
-    vi.mocked(api.fetchCurrentUser).mockResolvedValueOnce({ user: mockUser });
+    vi.mocked(api.fetchCurrentUser).mockResolvedValue({ user: mockUser });
 
     const { result } = renderHook(() => useAuth(), {
       wrapper: createWrapper(),
@@ -120,7 +124,7 @@ describe("AuthContext", () => {
   });
 
   it("should set user to null on refresh error (unauthenticated)", async () => {
-    vi.mocked(api.fetchCurrentUser).mockRejectedValueOnce(
+    vi.mocked(api.fetchCurrentUser).mockRejectedValue(
       new Error("Unauthorized")
     );
 
@@ -132,6 +136,8 @@ describe("AuthContext", () => {
       await result.current.refreshUser();
     });
 
-    expect(result.current.user).toBeNull();
+    await waitFor(() => {
+      expect(result.current.user).toBeNull();
+    });
   });
 });

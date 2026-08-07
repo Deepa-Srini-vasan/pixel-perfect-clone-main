@@ -1,6 +1,6 @@
 import { memo } from "react";
 import { Link } from "react-router-dom";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, MessageCircle } from "lucide-react";
 
 interface ProductCardProps {
   image: string;
@@ -10,12 +10,18 @@ interface ProductCardProps {
   shortDescription?: string;
 }
 
+const WHATSAPP_NUMBER = "6379665268";
+
 const ProductCard = memo(({ image, name, slug, category, shortDescription }: ProductCardProps) => {
   const link = slug ? `/product/${slug}` : "/shop";
 
   const desc =
     shortDescription ||
     `Premium industrial-grade product engineered for reliability and long-term performance.`;
+
+  const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
+    `Hi, I'm interested in ${name}${category ? ` (${category})` : ""}. Please share availability and details.`
+  )}`;
 
   return (
     <article
@@ -90,24 +96,51 @@ const ProductCard = memo(({ image, name, slug, category, shortDescription }: Pro
           {desc}
         </p>
 
-        {/* CTA */}
-        <Link
-          to={link}
-          data-testid="view-product-btn"
-          className="
-            mt-4 inline-flex items-center justify-center gap-2
-            w-full px-5 py-3 rounded-xl
-            text-[13px] font-bold tracking-wide
-            bg-slate-900 text-white
-            hover:bg-blue-600
-            shadow-[0_4px_14px_rgba(15,23,42,0.14)]
-            hover:shadow-[0_8px_24px_rgba(37,99,235,0.30)]
-            transition-all duration-300
-          "
-        >
-          View Product
-          <ArrowUpRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-        </Link>
+        {/* CTAs */}
+        <div className="mt-4 flex gap-2">
+          <Link
+            to={link}
+            data-testid="view-product-btn"
+            className="
+              flex-1 inline-flex items-center justify-center gap-2
+              px-4 py-3 rounded-xl
+              text-[13px] font-bold tracking-wide
+              bg-slate-900 text-white
+              hover:bg-blue-600
+              shadow-[0_4px_14px_rgba(15,23,42,0.14)]
+              hover:shadow-[0_8px_24px_rgba(37,99,235,0.30)]
+              transition-all duration-300
+            "
+          >
+            View
+            <ArrowUpRight className="w-3.5 h-3.5" />
+          </Link>
+          <a
+            href={whatsappUrl}
+            onClick={() => {
+              if (typeof window !== "undefined" && (window as any).gtag) {
+                (window as any).gtag("event", "whatsapp_inquiry_click", {
+                  event_category: "Inquiry",
+                  event_label: name,
+                });
+              }
+            }}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-testid="enquire-product-btn"
+            title="Quick Enquiry via WhatsApp"
+            className="
+              inline-flex items-center justify-center
+              px-3.5 py-3 rounded-xl
+              border border-emerald-200 bg-emerald-50
+              text-emerald-700
+              hover:bg-emerald-100
+              transition-all duration-200
+            "
+          >
+            <MessageCircle className="w-4 h-4" />
+          </a>
+        </div>
       </div>
     </article>
   );

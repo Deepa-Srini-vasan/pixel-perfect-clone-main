@@ -2,7 +2,7 @@ import TopBar from "@/components/TopBar";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageBanner from "@/components/PageBanner";
-import { Phone, MapPin, Clock, Mail, User } from "lucide-react";
+import { Phone, MapPin, Clock, Mail, User, ArrowRight } from "lucide-react";
 import { useState } from "react";
 import { apiUrl, submitEnquiry } from "@/lib/api";
 
@@ -41,26 +41,18 @@ const Contact = () => {
       <TopBar />
       <Header />
       <PageBanner
-        title="Contact Us"
+        title="Get In Touch With Us"
+        eyebrow="CONTACT & SUPPORT"
+        subtitle="Have questions about our products, dealer partnerships, or bulk project requirements? Our sales & technical team is online to assist you."
         breadcrumbs={[
           { label: "Home", to: "/" },
           { label: "Contact Us" },
         ]}
+        ctaText="SEND ENQUIRY"
+        ctaLink="#enquiry-form"
       />
       <main>
-        {/* Google Map */}
-        <div className="w-full h-[500px] bg-muted">
-          <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3909.866346914575!2d77.8698533!3d11.489564799999998!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ba95fbb4b00ffc9%3A0x25efcea40a0cd6c4!2sEUROAQUA%20PLUMTEK%20PVT%20LTD!5e0!3m2!1sen!2sin!4v1779788597579!5m2!1sen!2sin"
-            width="100%"
-            height="100%"
-            style={{ border: 0 }}
-            allowFullScreen
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-            title="Location Map"
-          />
-        </div>
+     
 
         {/* Contact Details + Form */}
         <section className="py-20">
@@ -195,21 +187,49 @@ Tamil Nadu.</p>
           </div>
         </section>
 
+           {/* Google Map */}
+        <div className="w-full h-[500px] bg-muted">
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3909.866346914575!2d77.8698533!3d11.489564799999998!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ba95fbb4b00ffc9%3A0x25efcea40a0cd6c4!2sEUROAQUA%20PLUMTEK%20PVT%20LTD!5e0!3m2!1sen!2sin!4v1779788597579!5m2!1sen!2sin"
+            width="100%"
+            height="100%"
+            style={{ border: 0 }}
+            allowFullScreen
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            title="Location Map"
+          />
+        </div>
+
         {/* Estimates CTA */}
-        <section className="bg-primary py-16">
-          <div className="container-pipes text-center">
-            <h2 className="text-3xl font-heading font-bold text-primary-foreground mb-4">
-              Estimates are Provided for Work!
+        <section className="py-24 bg-gradient-to-b from-[#071329] via-[#0b1c3d] to-[#040c1e] text-white relative overflow-hidden text-left">
+          <div className="container mx-auto px-6 max-w-5xl text-center relative z-10">
+            <span className="inline-block px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-cyan-300 text-[11px] font-black uppercase tracking-[0.22em] mb-5">
+              NEED CUSTOM ESTIMATES?
+            </span>
+            <h2 className="text-3xl md:text-5xl font-black text-white mb-4 tracking-tight">
+              Need a Custom Estimate for Your Next Project?
             </h2>
-            <p className="text-primary-foreground/80 mb-8">
-              Replacement, remodeling shower and water lines along with fixtures.
+            <p className="text-slate-300 text-base md:text-lg mb-10 max-w-xl mx-auto font-medium leading-relaxed">
+              Our engineering support team is ready to evaluate your architectural blueprints, bill of quantities, and product requirements.
             </p>
-            <a
-              href="#"
-              className="inline-block bg-primary-foreground text-primary px-8 py-3 text-sm font-semibold uppercase tracking-[2px] hover:opacity-90 transition-opacity"
-            >
-              Request an Estimate
-            </a>
+            <div className="flex flex-wrap gap-4 justify-center">
+              <a
+                href="#enquiry-form"
+                className="inline-flex items-center gap-2.5 bg-blue-600 hover:bg-blue-500 text-white font-extrabold text-xs uppercase tracking-wider px-8 py-4 rounded-full shadow-lg shadow-blue-600/30 transition-all hover:scale-105"
+              >
+                <span>Request Quotation</span>
+                <ArrowRight className="w-4 h-4" />
+              </a>
+              <a
+                href={`https://wa.me/6379665268?text=${encodeURIComponent("Hi, I would like to request a price quotation for Euroaqua Plumtek products.")}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2.5 border border-white/20 bg-white/5 hover:bg-white/10 text-white font-extrabold text-xs uppercase tracking-wider px-8 py-4 rounded-full transition-all"
+              >
+                <span>WhatsApp Us</span>
+              </a>
+            </div>
           </div>
         </section>
       </main>

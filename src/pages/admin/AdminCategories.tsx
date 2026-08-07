@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/context/AuthContext";
@@ -8,21 +8,14 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Plus, Edit2, Trash2, Loader2 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { apiUrl, getAuthHeaders } from "@/lib/api";
-
-interface Category {
-  id: number;
-  name: string;
-  slug: string;
-  description: string;
-  displayOrder: number;
-  isActive: boolean;
-}
+import type { Category } from "@/lib/category";
+import { buildCategoryTree, flattenCategoryOptions, type CategoryTreeItem } from "@/lib/category-tree";
 
 export default function AdminCategories() {
   const { user } = useAuth();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
-  const [formData, setFormData] = useState({ name: "", description: "", displayOrder: 0 });
+  const [formData, setFormData] = useState({ name: "", description: "", displayOrder: 0, parentId: null as number | null });
   const [isSaving, setIsSaving] = useState(false);
 
   const { data: categories = [], isLoading, refetch } = useQuery<Category[]>({
@@ -33,22 +26,58 @@ export default function AdminCategories() {
       });
       if (!res.ok) throw new Error("Failed to fetch categories");
       const data = await res.json();
-      return data.categories.map((category: Category & { display_order?: number; is_active?: number }) => ({
+      return data.categories.map((category: Category & { display_order?: number; is_active?: number; parent_name?: string }) => ({
         ...category,
         description: category.description ?? "",
         displayOrder: category.displayOrder ?? category.display_order ?? 0,
         isActive: category.isActive ?? Boolean(category.is_active),
+        parentName: category.parentName ?? category.parent_name ?? null,
       }));
     },
   });
 
+  const categoryTree = useMemo(() => buildCategoryTree(categories), [categories]);
+  const categoryOptions = useMemo(() => flattenCategoryOptions(categoryTree), [categoryTree]);
+
+  const renderCategoryRows = (nodes: CategoryTreeItem[], depth = 0): React.ReactNode[] =>
+    nodes.flatMap((node) => [
+      <div
+        key={node.category.id}
+        className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50"
+        style={{ paddingLeft: `${depth * 1.25}rem` }}
+      >
+        <div className="flex-1">
+          <p className="font-semibold text-foreground">{node.category.name}</p>
+          {node.category.description ? (
+            <p className="text-sm text-muted-foreground">{node.category.description}</p>
+          ) : node.category.parentName ? (
+            <p className="text-sm text-muted-foreground">Parent: {node.category.parentName}</p>
+          ) : null}
+        </div>
+        <div className="flex gap-2">
+          <Button size="sm" variant="outline" onClick={() => handleOpenDialog(node.category)}>
+            <Edit2 className="w-4 h-4" />
+          </Button>
+          <Button size="sm" variant="destructive" onClick={() => handleDelete(node.category.id)}>
+            <Trash2 className="w-4 h-4" />
+          </Button>
+        </div>
+      </div>,
+      ...renderCategoryRows(node.children, depth + 1),
+    ]);
+
   const handleOpenDialog = (category?: Category) => {
     if (category) {
       setEditingCategory(category);
-      setFormData({ name: category.name, description: category.description, displayOrder: category.displayOrder });
+      setFormData({
+        name: category.name,
+        description: category.description,
+        displayOrder: category.displayOrder,
+        parentId: category.parentId ?? null,
+      });
     } else {
       setEditingCategory(null);
-      setFormData({ name: "", description: "", displayOrder: 0 });
+      setFormData({ name: "", description: "", displayOrder: 0, parentId: null });
     }
     setIsDialogOpen(true);
   };
@@ -61,16 +90,24 @@ export default function AdminCategories() {
         ? apiUrl(`/api/admin/categories/${editingCategory.id}`)
         : apiUrl("/api/admin/categories");
 
+      const payload = {
+        name: formData.name,
+        description: formData.description,
+        displayOrder: formData.displayOrder,
+        parentId: formData.parentId,
+      };
+
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json", ...getAuthHeaders() },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
 
       if (!res.ok) {
         const payload = await res.json().catch(() => ({}));
         throw new Error(payload.error ?? "Failed to save category");
       }
+
       refetch();
       setIsDialogOpen(false);
     } catch (error) {
@@ -119,24 +156,7 @@ export default function AdminCategories() {
             <p className="text-center text-muted-foreground py-8">No categories found</p>
           ) : (
             <div className="space-y-2">
-              {categories.map((category) => (
-                <div key={category.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50">
-                  <div className="flex-1">
-                    <p className="font-semibold text-foreground">{category.name}</p>
-                    {category.description && (
-                      <p className="text-sm text-muted-foreground">{category.description}</p>
-                    )}
-                  </div>
-                  <div className="flex gap-2">
-                    <Button size="sm" variant="outline" onClick={() => handleOpenDialog(category)}>
-                      <Edit2 className="w-4 h-4" />
-                    </Button>
-                    <Button size="sm" variant="destructive" onClick={() => handleDelete(category.id)}>
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-              ))}
+              {renderCategoryRows(categoryTree)}
             </div>
           )}
         </CardContent>
@@ -167,11 +187,26 @@ export default function AdminCategories() {
               />
             </div>
             <div>
+              <label className="text-sm font-medium">Parent Category</label>
+              <select
+                className="mt-2 block w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                value={formData.parentId ?? ""}
+                onChange={(e) => setFormData({ ...formData, parentId: e.target.value ? Number(e.target.value) : null })}
+              >
+                <option value="">Top-level category</option>
+                {categoryOptions.map((option) => (
+                  <option key={option.id} value={option.id} disabled={editingCategory?.id === option.id}>
+                    {" ".repeat(option.depth * 3)}{option.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
               <label className="text-sm font-medium">Display Order</label>
               <Input
                 type="number"
                 value={formData.displayOrder}
-                onChange={(e) => setFormData({ ...formData, displayOrder: parseInt(e.target.value) })}
+                onChange={(e) => setFormData({ ...formData, displayOrder: parseInt(e.target.value) || 0 })}
               />
             </div>
             <div className="flex gap-2 justify-end">

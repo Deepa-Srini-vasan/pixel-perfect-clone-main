@@ -281,7 +281,7 @@ const MilestoneRoad: React.FC = () => {
           filter: grayscale(100%) sepia(100%) hue-rotate(188deg) saturate(280%) brightness(95%) contrast(110%);
         }
       `}</style>
-      <div className="container-pipes mb-12 flex flex-col md:flex-row md:items-end justify-between gap-4">
+      <div className="container-pipes mb-12 flex flex-col md:flex-row md:items-end justify-between gap-4 px-4 md:px-0">
         <div className="text-center md:text-left">
           <span className="inline-block px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-[0.2em] mb-4">
             {t("Our Journey")}
@@ -644,164 +644,53 @@ const MilestoneRoad: React.FC = () => {
         </div>
       </div>
 
-      {/* ── MOBILE VIEWPORT (VERTICAL WINDING ROAD TIMELINE) ── */}
-      <div className="lg:hidden container-pipes relative">
-        <div className="relative mx-auto max-w-md py-6 flex flex-col items-center">
-          {/* Vertical Pipeline SVG */}
-          <div className="absolute left-[30px] sm:left-[50px] top-0 bottom-0 w-[100px] -z-10">
-            <svg
-              className="w-full h-full pointer-events-none overflow-visible"
-              width="100"
-              height={`${milestones.length * 170}`}
-              viewBox={`0 0 100 ${milestones.length * 170}`}
-              fill="none"
-            >
-              {/* Vertical Pipe Outer Solid Outline with Soft Drop Shadow Filter */}
-              <motion.path
-                d={mobilePathD}
-                stroke="#1e293b"
-                strokeWidth="22"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                filter="url(#softShadow)"
-                initial={{ pathLength: 0 }}
-                whileInView={{ pathLength: 1 }}
-                viewport={{ once: true, margin: "-100px" }}
-                transition={{ duration: 2.2, ease: "easeInOut", delay: 0.02 }}
-              />
+      {/* ── MOBILE VIEWPORT (SLEEK MODERN VERTICAL TIMELINE) ── */}
+      <div className="lg:hidden relative w-full px-4">
+        <div className="relative py-2">
+          {/* Sleek Vertical Accent Line */}
+          <div className="absolute left-[19px] top-4 bottom-4 w-0.5 bg-gradient-to-b from-blue-600 via-sky-400 to-cyan-500 rounded-full" />
 
-              {/* Vertical Pipe 3D Metallic Inner Body */}
-              <motion.path
-                d={mobilePathD}
-                stroke="url(#verticalPipeGrad)"
-                strokeWidth="16"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                initial={{ pathLength: 0 }}
-                whileInView={{ pathLength: 1 }}
-                viewport={{ once: true, margin: "-100px" }}
-                transition={{ duration: 2.2, ease: "easeInOut", delay: 0.1 }}
-              />
-
-              {/* Pipe joint couplings at Milestone Anchors on mobile */}
-              {milestones.map((_, index) => {
-                const y = 80 + index * 170;
-                const x = 50 - Math.cos(index * Math.PI) * 20;
-                return (
-                  <g key={`m-coupling-${index}`} className="pointer-events-none">
-                    <rect
-                      x={x - 19}
-                      y={y - 6}
-                      width="38"
-                      height="12"
-                      rx="1.5"
-                      fill="url(#couplingGrad)"
-                      stroke="#1e293b"
-                      strokeWidth="1.2"
-                    />
-                  </g>
-                );
-              })}
-
-              {/* Mobile Elbow Joint Connector Sleeves (Couplings at start & end of all 90-degree mobile bends) */}
-              {Array.from({ length: milestones.length - 1 }).map((_, i) => {
-                const y = 80 + i * 170;
-                const yMid = y + 170 / 2;
-                const isLeft = i % 2 === 0;
-
-                if (isLeft) {
-                  // Transition from left (30px) to right (70px)
-                  return (
-                    <g key={`m-elbow-joints-${i}`} className="pointer-events-none">
-                      {/* Top entrance (horizontal ring on vertical pipe) */}
-                      <rect x={30 - 16} y={yMid - Rm - 5} width="32" height="10" rx="1" fill="url(#couplingGrad)" stroke="#1e293b" strokeWidth="1.2" />
-                      {/* Top exit (vertical ring on horizontal pipe) */}
-                      <rect x={30 + Rm - 5} y={yMid - 16} width="10" height="32" rx="1" fill="url(#couplingGrad)" stroke="#1e293b" strokeWidth="1.2" />
-                      {/* Bottom entrance (vertical ring on horizontal pipe) */}
-                      <rect x={70 - Rm - 5} y={yMid - 16} width="10" height="32" rx="1" fill="url(#couplingGrad)" stroke="#1e293b" strokeWidth="1.2" />
-                      {/* Bottom exit (horizontal ring on vertical pipe) */}
-                      <rect x={70 - 16} y={yMid + Rm - 5} width="32" height="10" rx="1" fill="url(#couplingGrad)" stroke="#1e293b" strokeWidth="1.2" />
-                    </g>
-                  );
-                } else {
-                  // Transition from right (70px) to left (30px)
-                  return (
-                    <g key={`m-elbow-joints-${i}`} className="pointer-events-none">
-                      {/* Top entrance (horizontal ring on vertical pipe) */}
-                      <rect x={70 - 16} y={yMid - Rm - 5} width="32" height="10" rx="1" fill="url(#couplingGrad)" stroke="#1e293b" strokeWidth="1.2" />
-                      {/* Top exit (vertical ring on horizontal pipe) */}
-                      <rect x={70 - Rm - 5} y={yMid - 16} width="10" height="32" rx="1" fill="url(#couplingGrad)" stroke="#1e293b" strokeWidth="1.2" />
-                      {/* Bottom entrance (vertical ring on horizontal pipe) */}
-                      <rect x={30 + Rm - 5} y={yMid - 16} width="10" height="32" rx="1" fill="url(#couplingGrad)" stroke="#1e293b" strokeWidth="1.2" />
-                      {/* Bottom exit (horizontal ring on vertical pipe) */}
-                      <rect x={30 - 16} y={yMid + Rm - 5} width="32" height="10" rx="1" fill="url(#couplingGrad)" stroke="#1e293b" strokeWidth="1.2" />
-                    </g>
-                  );
-                }
-              })}
-
-              {/* Glowing pipeline indicator dots on mobile */}
-              {milestones.map((m, index) => {
-                const y = 80 + index * 170;
-                const x = 50 - Math.cos(index * Math.PI) * 20;
-                
-                return (
-                  <g key={`m-glow-dot-${index}`} className="pointer-events-none">
-                    {/* Large soft color halo/glow */}
-                    <circle cx={x} cy={y} r="14" fill={m.color} opacity="0.25" />
-                    <circle cx={x} cy={y} r="9" fill={m.color} opacity="0.45" />
-                    {/* White border ring */}
-                    <circle cx={x} cy={y} r="6" fill="#ffffff" />
-                    {/* Inner bright solid colored circle */}
-                    <circle cx={x} cy={y} r="4" fill={m.color} />
-                  </g>
-                );
-              })}
-            </svg>
-          </div>
-
-          {/* Render Vertical Milestones */}
-          <div className="relative w-full space-y-[90px] pt-12">
+          {/* Render Mobile Milestone List */}
+          <div className="space-y-3.5 relative">
             {milestones.map((m, index) => {
-              const y = 80 + index * 170;
-              const x = 50 - Math.cos(index * Math.PI) * 20;
               const Icon = m.icon;
-
               return (
-                <div
-                  key={index}
-                  className="flex items-center w-full relative pl-[70px] sm:pl-[110px]"
-                >
-
-
-                  {/* Card side with product thumbnail on mobile */}
-                  <motion.div
-                    initial={{ opacity: 0, x: 30 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true, margin: "-50px" }}
-                    transition={{ duration: 0.5, delay: 0.1 }}
-                    className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm w-full relative cursor-default flex items-center"
+                <div key={m.year} className="relative flex items-center pl-12 group">
+                  {/* Glowing Node Dot on Timeline */}
+                  <div
+                    className="absolute left-[7px] top-3.5 w-6 h-6 rounded-full border-2 border-white shadow-md flex items-center justify-center shrink-0 z-10 transition-transform duration-300 group-hover:scale-110"
+                    style={{ backgroundColor: m.color }}
                   >
-                    {/* Left Border accent dot */}
-                    <div
-                      className="absolute top-1/2 -left-3 -translate-y-1/2 w-5 h-5 rounded-full border-4 border-white shadow-sm"
-                      style={{ backgroundColor: m.color }}
-                    />
+                    <Icon className="w-3 h-3 text-white" />
+                  </div>
 
-                    {/* Product Image Thumbnail */}
+                  {/* Milestone Card */}
+                  <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true, margin: "-30px" }}
+                    transition={{ duration: 0.4, delay: index * 0.03 }}
+                    className="w-full bg-white rounded-2xl border border-slate-100 p-3 shadow-xs hover:shadow-md transition-all duration-300 flex items-center gap-3"
+                  >
+                    {/* Thumbnail Image */}
                     <FallbackImage
                       src={m.generatedImage}
                       fallback={m.image}
                       alt={m.title}
-                      className="w-16 h-16 object-cover rounded-lg shrink-0 border border-slate-100 mr-4 blue-monochrome-filter"
+                      className="w-12 h-12 object-cover rounded-xl shrink-0 border border-slate-100 shadow-xs"
                     />
 
                     {/* Card Content */}
-                    <div>
-                      <span className="font-serif font-black text-xl mb-0.5 block" style={{ color: m.color }}>
-                        {m.year}
-                      </span>
-                      <p className="font-sans text-[12px] text-slate-600 leading-relaxed font-semibold">
+                    <div className="min-w-0 flex-1 text-left">
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <span
+                          className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider text-white"
+                          style={{ backgroundColor: m.color }}
+                        >
+                          {m.year}
+                        </span>
+                      </div>
+                      <p className="font-sans text-xs text-slate-800 font-extrabold leading-snug line-clamp-2">
                         {m.title}
                       </p>
                     </div>
