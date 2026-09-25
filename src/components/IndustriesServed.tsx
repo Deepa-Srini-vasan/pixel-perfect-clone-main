@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import MascotImg from "@/assets/3d-assets/1.png";
+import MascotImg from "@/assets/3d-assets/mascot_working_hd.png";
 import {
   ShieldCheck,
   Award,

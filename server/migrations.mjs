@@ -43,13 +43,13 @@ async function run() {
   });
 
   try {
-    // Read schema SQL file
-    const sqlPath = path.join(__dirname, 'schema-v3.sql');
-    const sql = fs.readFileSync(sqlPath, 'utf8');
-
-    console.log('Executing V3 Upgrades from schema-v3.sql...');
-    await conn.query(sql);
-    console.log('✓ Tables created/upgraded successfully.');
+//    // Read schema SQL file
+//    const sqlPath = path.join(__dirname, 'schema-v3.sql');
+//    const sql = fs.readFileSync(sqlPath, 'utf8');
+//
+//    console.log('Executing V3 Upgrades from schema-v3.sql...');
+//    await conn.query(sql);
+//    console.log('✓ Tables created/upgraded successfully.');
 
     // 1. Seed Permissions & Role mappings
     const perms = [

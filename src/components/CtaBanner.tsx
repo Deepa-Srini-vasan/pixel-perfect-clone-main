@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Phone, ArrowRight } from "lucide-react";
 import { motion, useInView } from "framer-motion";
 import ctaBg from "@/assets/3d-assets/cta-bg.png";
-import MascotImage from "@/assets/3d-assets/2.png";
+import MascotImage from "@/assets/3d-assets/mascot_happy_jump_hd.png";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 

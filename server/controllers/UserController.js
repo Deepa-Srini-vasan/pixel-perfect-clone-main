@@ -5,10 +5,7 @@ import { loginLimiter } from '../middleware/rateLimiter.js';
 
 export class UserController {
   async login(req, res) {
-    if (!loginLimiter(req)) {
-      sendJson(res, 429, { error: 'Too many login attempts' });
-      return;
-    }
+    loginLimiter(req);
 
     const { email, password } = await readBody(req);
     if (!email || !password) {

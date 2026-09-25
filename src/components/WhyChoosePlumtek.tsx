@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import MascotImg from "@/assets/3d-assets/1.png";
+import MascotImg from "@/assets/3d-assets/mascot_why_choose_hd.png";
 import {
   ShieldCheck,
   Award,
@@ -156,11 +156,11 @@ const WhyChoosePlumtek = () => (
           viewport={{ once: true }}
           className="lg:col-span-5 relative flex items-center justify-center"
         >
-          <div className="relative z-10 max-w-[160px] sm:max-w-[380px] lg:max-w-[440px] drop-shadow-[0_15px_30px_rgba(37,99,235,0.18)]">
+          <div className="relative z-10 max-w-[120px] sm:max-w-[200px] lg:max-w-[250px] drop-shadow-[0_12px_24px_rgba(37,99,235,0.18)]">
             <img
               src={MascotImg}
-              alt="Plumtek Mascot Ollie"
-              className="w-full h-auto object-contain hover:scale-105 transition-transform duration-500"
+              alt="Plumtek Mascot"
+              className="w-full max-h-[260px] sm:max-h-[300px] object-contain hover:scale-105 transition-transform duration-500"
             />
           </div>
         </motion.div>

@@ -1,6 +1,6 @@
 import React from "react";
 import { ArrowRight, MessageSquare, Handshake, Globe, Package, Users } from "lucide-react";
-import MascotGreeting from "@/assets/3d-assets/plumtek.png";
+import MascotGreeting from "@/assets/3d-assets/mascot_hero_hd.png";
 
 // Import product bubble cutouts
 import TapImage from "@/assets/3d-assets/tap.png";

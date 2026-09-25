@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, type FormEvent } from "react";
 import {
   X, Send, User, Settings, Key, RotateCcw, Maximize2, Minimize2
 } from "lucide-react";
-import imgVoice from "@/assets/3d-assets/img-voice.png";
+import imgVoice from "@/assets/3d-assets/mascot_hero_hd.png";
 
 interface ChatMessage {
   id: number;

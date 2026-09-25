@@ -28,8 +28,7 @@ import { InventoryService } from "../services/inventory.service";
 // HTTP CLIENT
 // ─────────────────────────────────────────────────────────────
 
-const API_BASE = import.meta.env.VITE_API_URL?.trim() ||
-  (import.meta.env.DEV ? "" : "http://127.0.0.1:8787");
+const API_BASE = import.meta.env.VITE_API_URL?.trim() || "";
 
 export const apiUrl = (path: string) => {
   const cleanPath = path.startsWith("/api/") && !path.startsWith("/api/v1/")

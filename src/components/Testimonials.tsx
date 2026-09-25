@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, Star } from "lucide-react";
-import imgVoice from "@/assets/3d-assets/img-voice.png";
+import imgVoice from "@/assets/3d-assets/mascot_happy_jump_hd.png";
 
 // Premium diamond sparkle divider icon
 const DiamondSpark = ({ className = "" }: { className?: string }) => (
@@ -126,7 +126,7 @@ const Testimonials = () => {
             >
               <img
                 src={imgVoice}
-                alt="Aqua Otter Mascot"
+                alt="Plumtek Mascot"
                 className="w-full h-auto object-contain"
               />
             </motion.div>

@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import logo from "@/assets/logo.png";
-import MascotImage from "@/assets/3d-assets/plumtek.png";
+import MascotImage from "@/assets/3d-assets/mascot_hero_hd.png";
 import { Facebook, Twitter, Instagram, Linkedin, MapPin, Phone, Mail, Clock, ChevronRight } from "lucide-react";
 
 const TEXT = {

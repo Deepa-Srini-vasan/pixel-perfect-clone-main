@@ -33,7 +33,7 @@ export const UserService = {
         localStorage.setItem("plumtek_admin_user", JSON.stringify(res.user));
       }
       return res;
-    } catch {
+    } catch (e) {
       // Fallback for local development if server API is offline
       const user: AdminUser = {
         id: Date.now(),
@@ -51,7 +51,7 @@ export const UserService = {
     localStorage.removeItem("plumtek_admin_user");
     try {
       return await request<{ success: boolean }>("/api/auth/logout", { method: "POST" });
-    } catch {
+    } catch (e) {
       return { success: true };
     }
   },
@@ -59,14 +59,9 @@ export const UserService = {
   fetchCurrentUser: async () => {
     try {
       return await request<{ user: AdminUser }>("/api/auth/me");
-    } catch {
-      const saved = localStorage.getItem("plumtek_admin_user");
-      if (saved) {
-        return { user: JSON.parse(saved) as AdminUser };
-      }
-      // Default fallback logged-in user so admin panel works smoothly out-of-the-box
-      localStorage.setItem("plumtek_admin_user", JSON.stringify(DEFAULT_ADMIN_USER));
-      return { user: DEFAULT_ADMIN_USER };
+    } catch (e) {
+      localStorage.removeItem("plumtek_admin_user");
+      throw e;
     }
   },
 
@@ -74,7 +69,7 @@ export const UserService = {
   fetchAdminUsers: async () => {
     try {
       return await request<{ users: AdminUser[] }>("/api/admin/users");
-    } catch {
+    } catch (e) {
       return { users: DEFAULT_MOCK_USERS };
     }
   },
@@ -82,7 +77,7 @@ export const UserService = {
   createAdminUser: async (data: { email: string; password: string; name: string; role: string; phone?: string }) => {
     try {
       return await request<{ id: number }>("/api/admin/users", { method: "POST", body: JSON.stringify(data) });
-    } catch {
+    } catch (e) {
       return { id: Date.now() };
     }
   },
@@ -90,7 +85,7 @@ export const UserService = {
   updateAdminUser: async (id: number, data: Partial<AdminUser> & { password?: string }) => {
     try {
       return await request<{ success: boolean }>(`/api/admin/users/${id}`, { method: "PUT", body: JSON.stringify(data) });
-    } catch {
+    } catch (e) {
       return { success: true };
     }
   },
@@ -98,7 +93,7 @@ export const UserService = {
   deleteAdminUser: async (id: number) => {
     try {
       return await request<{ success: boolean }>(`/api/admin/users/${id}`, { method: "DELETE" });
-    } catch {
+    } catch (e) {
       return { success: true };
     }
   },
@@ -107,7 +102,7 @@ export const UserService = {
   fetchPageSeo: async (pageKey: string) => {
     try {
       return await request<{ seo: ApiPageSeo | null }>(`/api/seo/${pageKey}`);
-    } catch {
+    } catch (e) {
       return { seo: null };
     }
   },
@@ -115,7 +110,7 @@ export const UserService = {
   fetchAdminSeoPages: async () => {
     try {
       return await request<{ pages: ApiPageSeo[] }>("/api/admin/seo");
-    } catch {
+    } catch (e) {
       return { pages: [] };
     }
   },
@@ -123,7 +118,7 @@ export const UserService = {
   fetchAdminSeoPage: async (pageKey: string) => {
     try {
       return await request<{ seo: ApiPageSeo | null }>(`/api/admin/seo/${pageKey}`);
-    } catch {
+    } catch (e) {
       return { seo: null };
     }
   },
@@ -131,7 +126,7 @@ export const UserService = {
   updateAdminSeoPage: async (pageKey: string, data: Partial<ApiPageSeo>) => {
     try {
       return await request<{ success: boolean }>(`/api/admin/seo/${pageKey}`, { method: "PUT", body: JSON.stringify(data) });
-    } catch {
+    } catch (e) {
       return { success: true };
     }
   },
@@ -142,7 +137,7 @@ export const UserService = {
       return await request<Record<string, Record<string, string>>>(
         group ? `/api/admin/settings/${group}` : "/api/admin/settings"
       );
-    } catch {
+    } catch (e) {
       return {
         site: { title: "Euroaqua Plumtek", phone: "+91 98427 42936", email: "support@euroaquappr.com" },
       };
@@ -152,7 +147,7 @@ export const UserService = {
   updateAdminSettings: async (data: Record<string, Record<string, string>>) => {
     try {
       return await request<{ success: boolean; updated: number }>("/api/admin/settings", { method: "PUT", body: JSON.stringify(data) });
-    } catch {
+    } catch (e) {
       return { success: true, updated: 1 };
     }
   },
@@ -163,7 +158,7 @@ export const UserService = {
       return await request<{ logs: Array<{ id: number; action: string; entity_type: string; entity_id: number; admin_name: string; ip_address: string; created_at: string }>; total: number }>(
         `/api/admin/activity-logs?page=${page}&limit=${limit}`
       );
-    } catch {
+    } catch (e) {
       return {
         logs: [
           {

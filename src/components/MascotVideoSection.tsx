@@ -16,7 +16,7 @@ const MascotVideoSection = () => {
             playsInline
             className="absolute inset-0 w-full h-full object-cover z-0"
           >
-            <source src={mascotVideo} type="video/mp4" />
+            <source src="/Otter_mascot_rides_water_wave_20260925121034.mp4" type="video/mp4" />
           </video>
 
           {/* Dark Glass Overlay */}

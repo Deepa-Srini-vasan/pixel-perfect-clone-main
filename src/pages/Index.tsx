@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useState } from "react";
 import TopBar from "@/components/TopBar";
 import Header from "@/components/Header";
+import VideoHero from "../components/VideoHero";
 import HeroSlider from "../components/HeroSlider";
 import FeaturesBar from "@/components/FeaturesBar";
 import InnovativeProducts from "@/components/InnovativeProducts";
@@ -41,6 +42,9 @@ const Index = () => {
       <TopBar />
       <Header />
       <main className="relative">
+        <div data-reveal="up">
+          <VideoHero />
+        </div>
         <div data-reveal="up">
           <HeroSlider />
         </div>

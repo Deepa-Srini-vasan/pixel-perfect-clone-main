@@ -1,7 +1,7 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import { Download, FileText, CheckCircle2, ShieldCheck } from "lucide-react";
-import MascotGreeting from "@/assets/3d-assets/img-certi.png";
+import MascotGreeting from "@/assets/3d-assets/mascot_cert_hd.png";
 import isoLogo from "@/assets/3d-assets/iso.png";
 import bisLogo from "@/assets/3d-assets/bureau-of-indian-standards-bis-logo-png_seeklogo-676929.png";
 import ceLogo from "@/assets/3d-assets/ce-seeklogo.png";
