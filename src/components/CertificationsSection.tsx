@@ -1,7 +1,7 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import { Download, FileText, CheckCircle2, ShieldCheck } from "lucide-react";
-import MascotGreeting from "@/assets/3d-assets/mascot_cert_hd.png";
+import MascotGreeting from "@/assets/3d-assets/mascot_cert_download_hd.png";
 import isoLogo from "@/assets/3d-assets/iso.png";
 import bisLogo from "@/assets/3d-assets/bureau-of-indian-standards-bis-logo-png_seeklogo-676929.png";
 import ceLogo from "@/assets/3d-assets/ce-seeklogo.png";
@@ -202,13 +202,13 @@ const CertificationsSection = () => {
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(59,130,246,0.15),transparent_60%)] rounded-2xl sm:rounded-3xl" />
 
           {/* Content */}
-          <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-5 sm:gap-8 p-5 sm:p-8 lg:p-10 lg:pl-60">
+          <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-5 sm:gap-8 p-5 sm:p-8 lg:p-10 lg:pl-64">
 
-            {/* Mascot Ollie on Left (desktop) */}
-            <div className="absolute left-2 lg:left-4 bottom-0 w-[160px] h-[160px] lg:w-[210px] lg:h-[210px] pointer-events-none z-20 hidden md:block">
+            {/* Mascot on Left (desktop) */}
+            <div className="absolute left-2 lg:left-6 bottom-0 w-[170px] h-[190px] lg:w-[230px] lg:h-[250px] pointer-events-none z-20 hidden md:block">
               <motion.img
                 src={MascotGreeting}
-                alt="Plumtek Mascot Ollie"
+                alt="Plumtek Certified Quality Mascot"
                 className="w-full h-full object-contain drop-shadow-[0_15px_30px_rgba(0,0,0,0.3)]"
                 initial={{ y: 10, opacity: 0 }}
                 animate={isInView ? { y: 0, opacity: 1 } : {}}
