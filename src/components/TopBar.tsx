@@ -11,11 +11,11 @@ const TopBar = () => (
         </span>
         <span className="text-slate-700">|</span>
         <a
-          href="tel:+919842742936"
+          href="tel:+917373073333"
           className="flex items-center gap-1.5 hover:text-blue-400 transition-colors shrink-0"
         >
           <Phone className="w-3 h-3 text-blue-400" />
-          +91 98427 42936
+          +91 73730 73333 | +91 92800 43815
         </a>
         <span className="hidden lg:flex items-center gap-1.5 text-slate-400 truncate">
           <MapPin className="w-3 h-3 text-blue-400 shrink-0" />

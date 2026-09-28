@@ -20,6 +20,7 @@ import {
   Globe,
 } from "lucide-react";
 import { useState } from "react";
+import DealerInquiryModal from "@/components/DealerInquiryModal";
 import plumtekBg from "@/assets/3d-assets/plumtek-bg.png";
 import bgPlumtekSection02 from "@/assets/3d-assets/bg-plumtek-section-02.png";
 import imgVoice from "@/assets/3d-assets/img-voice.png";
@@ -126,6 +127,7 @@ const TABS = ["All", "Plumbing Dealers", "Builders & Contractors", "Industrial P
 const Clients = () => {
   const [activeTab, setActiveTab] = useState("All");
   const [activeTestimonial, setActiveTestimonial] = useState(0);
+  const [dealerModalOpen, setDealerModalOpen] = useState(false);
 
   const filtered = activeTab === "All"
     ? clientLogos
@@ -457,13 +459,13 @@ const Clients = () => {
               </div>
 
               <div className="flex flex-col gap-4">
-                <a
-                  href="/contact"
+                <button
+                  onClick={() => setDealerModalOpen(true)}
                   className="inline-flex items-center justify-center gap-3 bg-blue-600 hover:bg-blue-500 text-white font-extrabold text-xs uppercase tracking-wider px-8 py-4 rounded-full shadow-lg shadow-blue-600/30 transition-all hover:scale-105"
                 >
                   <span>Dealer Enquiry</span>
                   <ArrowRight className="w-4 h-4" />
-                </a>
+                </button>
                 <a
                   href={`https://wa.me/6379665268?text=${encodeURIComponent("Hi, I'm interested in becoming an authorised dealer for Euro Plumber Tech (Plumtek).")}`}
                   target="_blank" rel="noopener noreferrer"
@@ -477,6 +479,7 @@ const Clients = () => {
           </div>
         </section>
       </main>
+      <DealerInquiryModal isOpen={dealerModalOpen} onClose={() => setDealerModalOpen(false)} />
 
       <Footer />
     </div>

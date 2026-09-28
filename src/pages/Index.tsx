@@ -16,9 +16,11 @@ import IndustriesServed from "@/components/IndustriesServed";
 import WhyChoosePlumtek from "@/components/WhyChoosePlumtek";
 import CertificationsSection from "@/components/CertificationsSection";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
+import EstimateModal from "@/components/EstimateModal";
 
 const Index = () => {
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [estimateModalOpen, setEstimateModalOpen] = useState(false);
   useScrollReveal();
 
   useEffect(() => {
@@ -101,10 +103,11 @@ const Index = () => {
         </div>
 
         <div data-reveal="up" data-reveal-delay="220">
-          <CtaBanner />
+          <CtaBanner onEstimateClick={() => setEstimateModalOpen(true)} />
         </div>
       </main>
       <Footer />
+      <EstimateModal isOpen={estimateModalOpen} onClose={() => setEstimateModalOpen(false)} />
     </div>
   );
 };

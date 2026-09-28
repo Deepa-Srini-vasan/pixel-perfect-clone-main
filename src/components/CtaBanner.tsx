@@ -1,5 +1,4 @@
 import { useRef } from "react";
-import { Link } from "react-router-dom";
 import { Phone, ArrowRight } from "lucide-react";
 import { motion, useInView } from "framer-motion";
 import ctaBg from "@/assets/3d-assets/cta-bg.png";
@@ -7,7 +6,7 @@ import MascotImage from "@/assets/3d-assets/mascot_happy_jump_hd.png";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
-const CtaBanner = () => {
+const CtaBanner = ({ onEstimateClick }: { onEstimateClick?: () => void }) => {
   const ref = useRef<HTMLElement>(null);
   const inView = useInView(ref, { once: true, margin: "-10%" });
 
@@ -74,8 +73,8 @@ const CtaBanner = () => {
               className="w-full flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-4"
             >
               {/* Primary CTA */}
-              <Link
-                to="/contact"
+              <button
+                onClick={onEstimateClick}
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-blue-600 hover:bg-blue-700
                            text-white font-extrabold tracking-wide px-7 py-3 sm:py-4 rounded-full
                            shadow-lg shadow-blue-600/30 hover:scale-[1.02]
@@ -83,11 +82,11 @@ const CtaBanner = () => {
               >
                 Request an Estimate
                 <ArrowRight className="w-4 h-4" />
-              </Link>
+              </button>
 
               {/* Phone link pill */}
               <a
-                href="tel:+919842742936"
+                href="tel:+917373073333"
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-3 border border-white/20 bg-slate-900/60 hover:bg-slate-900/80
                            text-white font-extrabold px-6 py-2.5 sm:py-3 rounded-full hover:scale-[1.02] transition-all duration-300 text-xs sm:text-sm"
               >
@@ -99,7 +98,7 @@ const CtaBanner = () => {
                     Call Our Team
                   </span>
                   <span className="block text-[13px] sm:text-[14px] text-white font-black tracking-wide">
-                    +91 98427 42936
+                    +91 73730 73333
                   </span>
                 </div>
               </a>

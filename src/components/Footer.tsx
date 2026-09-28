@@ -9,7 +9,8 @@ const TEXT = {
   productRange: "Product Range",
   contactInfo: "Contact Info",
   address: "Edappadi Main road, Kuppanoor (P.O), Sankari (T.K), Pin: 637 301, Salem, Tamil Nadu.",
-  phone: "+91 98427 42936",
+  phone: "+91 73730 73333",
+  phone2: "+91 92800 43815",
   email: "support@euroaquappr.com",
   hours: "Mon - Fri 8:00 - 18:00",
   rights: "© 2025 Euro Plumber Tech Private Limited. All rights reserved.",
@@ -155,9 +156,14 @@ const Footer = () => {
                 <span className="w-9 h-9 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
                   <Phone className="w-4.5 h-4.5" />
                 </span>
-                <a href={`tel:${TEXT.phone}`} className="text-slate-600 hover:text-blue-600 transition-colors font-medium">
-                  {TEXT.phone}
-                </a>
+                <div>
+                  <a href={`tel:${TEXT.phone}`} className="block text-slate-600 hover:text-blue-600 transition-colors font-medium">
+                    {TEXT.phone}
+                  </a>
+                  <a href={`tel:${TEXT.phone2}`} className="block text-slate-600 hover:text-blue-600 transition-colors font-medium">
+                    {TEXT.phone2}
+                  </a>
+                </div>
               </li>
               <li className="flex items-center gap-3.5 text-[14px]">
                 <span className="w-9 h-9 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">

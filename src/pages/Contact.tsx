@@ -80,7 +80,7 @@ Tamil Nadu.</p>
                     <Phone className="w-5 h-5 text-primary mt-1 flex-shrink-0" />
                     <div>
                       <h4 className="font-heading font-semibold text-foreground mb-1">Phone</h4>
-                      <p className="text-muted-foreground">+ 91 98427 42936 <br/> +91 99650 05555 <br/> +91 73730 73333</p>
+                      <p className="text-muted-foreground">+91 73730 73333 <br/> +91 92800 43815 <br/> +91 98427 42936</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-4">

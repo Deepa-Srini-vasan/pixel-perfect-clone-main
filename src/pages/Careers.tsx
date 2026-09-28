@@ -435,7 +435,7 @@ const Careers = () => {
               <a href="mailto:hr@plumtek.com" className="text-cyan-300 font-bold underline hover:text-white transition-colors">
                 hr@plumtek.com
               </a>{" "}
-              or call us directly at +91 98427 42936.
+              or call us directly at +91 73730 73333.
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
               <a
@@ -446,7 +446,7 @@ const Careers = () => {
                 <ArrowRight className="w-4 h-4" />
               </a>
               <a
-                href="tel:+919842742936"
+                href="tel:+917373073333"
                 className="inline-flex items-center gap-2.5 border border-white/20 bg-white/5 hover:bg-white/10 text-white font-extrabold text-xs uppercase tracking-wider px-8 py-4 rounded-full transition-all"
               >
                 <span>Call Recruitment</span>

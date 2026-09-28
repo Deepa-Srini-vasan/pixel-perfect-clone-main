@@ -47,10 +47,10 @@ const CATALOGS = [
   },
   {
     id: "cat-3",
-    title: "PTMT Price List (PL Code 1 to 8)",
+    title: "PTMT Complete Price List (PL Code 1 to 16)",
     category: "Price Lists",
-    description: "Official master price list for Plumtek PTMT taps, premium faucets, connection items, and plumbing accessories.",
-    pages: 8,
+    description: "Complete master price list for Plumtek PTMT taps, faucets, valves, stopcocks, concealed valve systems, and all hardware accessories.",
+    pages: 16,
     publishDate: "January 2026",
     coverImage: catFittings,
     pdfUrl: "/assets/img/catalogues/PLUMTEK PTMT PRICE LIST PL CODE 1 to 8.pdf",
@@ -60,19 +60,32 @@ const CATALOGS = [
   },
   {
     id: "cat-4",
-    title: "PTMT Price List (PL Code 9 to 16)",
-    category: "Price Lists",
-    description: "Official master price list for Plumtek PTMT valves, stopcocks, premium concealed valve systems, and hardware.",
-    pages: 8,
-    publishDate: "January 2026",
+    title: "PERT Pipes & Fittings Catalogue",
+    category: "PERT Systems",
+    description: "Comprehensive catalogue for PLUMTEK FASTFIT PERT pushfit pipes and fittings — India's first pushfit plumbing system.",
+    pages: 24,
+    publishDate: "September 2025",
     coverImage: catValves,
-    pdfUrl: "/assets/img/catalogues/PLUMTEK PTMT PRICE LIST PL CODE 9 to 16.pdf",
+    pdfUrl: "/assets/img/catalogues/PERT Catalogue.pdf",
     featured: false,
-    badge: "Popular",
-    badgeColor: "bg-emerald-600",
+    badge: "New",
+    badgeColor: "bg-violet-600",
+  },
+  {
+    id: "cat-5",
+    title: "HDPE Pipes & Fittings Catalogue",
+    category: "HDPE Systems",
+    description: "Full specification guide for Plumtek HDPE and MDPE pipes for agriculture, industrial, and infrastructure applications.",
+    pages: 20,
+    publishDate: "September 2025",
+    coverImage: catOverview,
+    pdfUrl: "/assets/img/catalogues/HDPE Catalogue.pdf",
+    featured: false,
+    badge: "New",
+    badgeColor: "bg-teal-600",
   },
 ];
-const CATEGORIES = ["All", "Hoses", "PPR Systems", "Price Lists"];
+const CATEGORIES = ["All", "Hoses", "PPR Systems", "Price Lists", "PERT Systems", "HDPE Systems"];
 const ease = [0.16, 1, 0.3, 1] as const;
 
 /* ─── Catalog Card ────────────────────────────────────── */
