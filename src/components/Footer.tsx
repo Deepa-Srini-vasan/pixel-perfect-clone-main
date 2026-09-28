@@ -21,17 +21,16 @@ const TEXT = {
 const quickLinks = [
   { label: "Home", to: "/" },
   { label: "About Us", to: "/about" },
-  { label: "Our Store", to: "/shop" },
+  { label: "Product Varieties", to: "/shop" },
   { label: "Catalogs", to: "/catalogs" },
   { label: "Careers", to: "/careers" },
   { label: "Contact Us", to: "/contact" },
 ];
 
 const categories = [
-  { label: "Pipes", to: "/shop?category=ppr-pipes" },
-  { label: "Fittings", to: "/shop?category=ppr-fittings" },
-  { label: "Valves", to: "/shop?category=valves" },
-  { label: "Accessories", to: "/shop?category=accessories" },
+  { label: "Taps & Faucets", to: "/shop?category=taps-faucets-accessories" },
+  { label: "Hoses", to: "/shop?category=hoses" },
+  { label: "Pipes & Fittings", to: "/shop?category=ppr-pipes" },
 ];
 
 const socials = [

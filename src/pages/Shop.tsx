@@ -317,7 +317,7 @@ const Shop = () => {
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.2 }}
-                    className="whitespace-nowrap"
+                    className="flex flex-col min-w-0"
                   >
                     {(searchQuery || activeCategory !== "All categories" || sortBy !== "latest") && (
                       <button 
@@ -653,7 +653,7 @@ const Shop = () => {
                             image={resolveProductImage(product.imageKey, product.imageData)}
                             name={product.name}
                             slug={product.slug}
-                            category={product.category}
+                            serialNumber={product.sku || `SN-${product.id}`}
                             shortDescription={product.shortDescription}
                           />
                         </motion.div>

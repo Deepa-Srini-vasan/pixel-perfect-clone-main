@@ -7,12 +7,13 @@ interface ProductCardProps {
   name: string;
   slug?: string;
   category?: string;
+  serialNumber?: string;
   shortDescription?: string;
 }
 
 const WHATSAPP_NUMBER = "6379665268";
 
-const ProductCard = memo(({ image, name, slug, category, shortDescription }: ProductCardProps) => {
+const ProductCard = memo(({ image, name, slug, category, serialNumber, shortDescription }: ProductCardProps) => {
   const link = slug ? `/product/${slug}` : "/shop";
 
   const desc =
@@ -73,10 +74,12 @@ const ProductCard = memo(({ image, name, slug, category, shortDescription }: Pro
       {/* ── Content ── */}
       <div className="flex flex-col flex-1 px-6 pt-5 pb-6 gap-2">
 
-        {/* Category */}
-        <span className="text-[10px] font-black uppercase tracking-[0.22em] text-blue-500">
-          {category ?? "Industrial"}
-        </span>
+        {/* Serial Number */}
+        {serialNumber && (
+          <span className="text-[10px] font-black uppercase tracking-[0.22em] text-blue-500">
+            {serialNumber}
+          </span>
+        )}
 
         {/* Product name */}
         <Link

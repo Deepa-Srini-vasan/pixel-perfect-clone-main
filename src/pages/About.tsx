@@ -42,14 +42,9 @@ const t = (key: string) => key;
 const BranchesSection = lazy(() => import("@/components/BranchesSection"));
 
 const galleryItems = [
-  { image: gallery1, title: "Premium Chrome Faucet", category: "Taps, Faucets & Accessories" },
-  { image: gallery2, title: "PPR Cold Water Pipe", category: "PPR, PP-RCT Pipes" },
-  { image: gallery3, title: "PPR Equal Tee", category: "PPR Fittings" },
-  { image: gallery4, title: "PERT Pushfit Connector", category: "PERT & Push Fittings" },
-  { image: gallery5, title: "HDPE High Pressure Pipe", category: "HDPE & MDPE Fittings" },
-  { image: gallery6, title: "PPR 90 Degree Elbow", category: "PPR Fittings" },
-  { image: gallery7, title: "Heavy Duty Garden Hose", category: "Hoses" },
-  { image: gallery8, title: "Ergonomic Mixer Tap", category: "Taps, Faucets & Accessories" },
+  { image: gallery1, title: "Premium Taps & Faucets Collection", category: "Taps & Faucets" },
+  { image: gallery7, title: "Industrial & Garden Hoses Range", category: "Hoses" },
+  { image: gallery2, title: "Complete Pipes & Fittings System", category: "Pipes & Fittings" },
 ];
 
 const values = [
@@ -59,7 +54,7 @@ const values = [
   { title: "Innovation", desc: "Pioneering solutions that work at all temperatures and environments — built for tomorrow's challenges.", Icon: Lightbulb, glow: "bg-purple-50 text-purple-600 border-purple-100" },
 ];
 
-const TABS = ["view all", "Taps, Faucets & Accessories", "PPR, PP-RCT Pipes", "PPR Fittings", "PERT & Push Fittings", "HDPE & MDPE Fittings", "Hoses"];
+const TABS = ["view all", "Taps & Faucets", "Hoses", "Pipes & Fittings"];
 
 const fade = { hidden: { opacity: 0, y: 32 }, visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] as const } } };
 const stagger = { hidden: {}, visible: { transition: { staggerChildren: 0.1 } } };

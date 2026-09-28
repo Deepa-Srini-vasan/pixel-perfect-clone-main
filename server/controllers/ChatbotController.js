@@ -1,4 +1,5 @@
 import { productService } from '../services/ProductService.js';
+import { settingService } from '../services/SettingService.js';
 import { sendJson, readBody } from '../utils/http.js';
 
 function getFallbackReply(question, products) {
@@ -57,8 +58,9 @@ export class ChatbotController {
       // 1. Fetch catalog context from Database
       const { products } = await productService.getProducts({ limit: 1000, active: true });
 
-      // 2. Read Gemini key
-      const apiKey = process.env.GEMINI_API_KEY || '';
+      // 2. Read Gemini key from settings or env as fallback
+      const { settings } = await settingService.getSettings('chatbot');
+      const apiKey = settings?.chatbot?.gemini_api_key || process.env.GEMINI_API_KEY || '';
 
       if (!apiKey) {
         // Fallback to local rule engine if no API key is provided

@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import DealerInquiryModal from "@/components/DealerInquiryModal";
+import DealerLocator from "@/components/DealerLocator";
 import plumtekBg from "@/assets/3d-assets/plumtek-bg.png";
 import bgPlumtekSection02 from "@/assets/3d-assets/bg-plumtek-section-02.png";
 import imgVoice from "@/assets/3d-assets/img-voice.png";
@@ -479,6 +480,10 @@ const Clients = () => {
           </div>
         </section>
       </main>
+
+      {/* ── Dealer Locator ── */}
+      <DealerLocator />
+
       <DealerInquiryModal isOpen={dealerModalOpen} onClose={() => setDealerModalOpen(false)} />
 
       <Footer />

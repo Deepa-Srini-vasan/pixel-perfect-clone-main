@@ -57,7 +57,11 @@ const categories = [
   { name: "Accessories", slug: "taps-faucets-accessories", icon: AccessoriesIcon },
 ];
 
-const HeroSlider: React.FC = () => {
+interface HeroSliderProps {
+  onOpenDealerModal?: () => void;
+}
+
+const HeroSlider: React.FC<HeroSliderProps> = ({ onOpenDealerModal }) => {
   return (
     <section className="relative bg-white overflow-hidden pt-10 pb-12 sm:pt-16 sm:pb-16 lg:pt-24 lg:pb-20 border-b border-slate-100">
       {/* Light soft curved mesh overlay background */}
@@ -84,20 +88,20 @@ const HeroSlider: React.FC = () => {
 
             {/* CTA Buttons - Full Width Responsive on Mobile */}
             <div className="w-full sm:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 mb-8 sm:mb-10">
-              <a 
-                href="/shop" 
+              <button 
+                onClick={onOpenDealerModal}
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 rounded-full bg-blue-600 hover:bg-blue-750 px-7 py-3.5 text-sm font-extrabold text-white shadow-lg shadow-blue-600/20 transition-all duration-300 hover:-translate-y-0.5"
               >
                 Explore Our Range
                 <ArrowRight className="w-4 h-4" />
-              </a>
-              <a 
-                href="/contact" 
+              </button>
+              <button 
+                onClick={onOpenDealerModal}
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 rounded-full border border-slate-200 bg-white hover:bg-slate-50 px-6 py-3.5 text-sm font-extrabold text-slate-700 transition-all duration-300 hover:-translate-y-0.5"
               >
                 Request Quote
                 <MessageSquare className="w-4 h-4 text-blue-600" />
-              </a>
+              </button>
             </div>
 
             {/* Trust/Stats Cards Row - Perfectly Aligned Grid on Mobile */}
@@ -153,11 +157,11 @@ const HeroSlider: React.FC = () => {
 
           {/* Right Column: Mascot Image */}
           <div className="lg:col-span-6 relative flex justify-center items-center h-[260px] sm:h-[340px] lg:h-[650px] z-10 select-none mt-4 lg:mt-0">
-            <div className="relative w-[220px] h-[220px] sm:w-[320px] sm:h-[320px] md:w-[440px] md:h-[440px] z-10">
+            <div className="relative w-[220px] h-[220px] sm:w-[320px] sm:h-[320px] md:w-[440px] md:h-[440px] z-10 animate-float-slow">
               <img 
                 src={MascotGreeting} 
                 alt="Plumtek Mascot Ollie" 
-                className="w-full h-full object-contain drop-shadow-[0_15px_35px_rgba(37,99,235,0.18)]"
+                className="w-full h-full object-contain drop-shadow-[0_15px_35px_rgba(37,99,235,0.18)] transition-transform duration-700 hover:scale-105"
               />
             </div>
 

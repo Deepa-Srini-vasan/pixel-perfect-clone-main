@@ -17,10 +17,12 @@ import WhyChoosePlumtek from "@/components/WhyChoosePlumtek";
 import CertificationsSection from "@/components/CertificationsSection";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 import EstimateModal from "@/components/EstimateModal";
+import DealerInquiryModal from "@/components/DealerInquiryModal";
 
 const Index = () => {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [estimateModalOpen, setEstimateModalOpen] = useState(false);
+  const [dealerModalOpen, setDealerModalOpen] = useState(false);
   useScrollReveal();
 
   useEffect(() => {
@@ -48,7 +50,7 @@ const Index = () => {
           <VideoHero />
         </div>
         <div data-reveal="up">
-          <HeroSlider />
+          <HeroSlider onOpenDealerModal={() => setDealerModalOpen(true)} />
         </div>
         {/* Ambient background mesh */}
         <div
@@ -108,6 +110,7 @@ const Index = () => {
       </main>
       <Footer />
       <EstimateModal isOpen={estimateModalOpen} onClose={() => setEstimateModalOpen(false)} />
+      <DealerInquiryModal isOpen={dealerModalOpen} onClose={() => setDealerModalOpen(false)} />
     </div>
   );
 };

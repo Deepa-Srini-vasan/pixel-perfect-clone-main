@@ -162,65 +162,29 @@ const AIChatbot = () => {
     setMessages([initialGreeting]);
   };
 
-  /* Call Google Gemini API directly */
-  const callGeminiAPI = async (userPrompt: string, history: ChatMessage[]) => {
-    const keyToUse = apiKey.trim() || DEFAULT_GEMINI_KEY;
+  /* Call backend API instead of direct Gemini */
+  const callBackendChatAPI = async (userPrompt: string, history: ChatMessage[]) => {
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL?.trim() || "";
+      const endpoint = `${apiUrl}/api/v1/chatbot/chat`;
+      
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: userPrompt,
+          history: history.map(m => ({ role: m.role, content: m.content }))
+        }),
+      });
 
-    const modelsToTry = [
-      "gemini-2.0-flash",
-      "gemini-1.5-flash",
-      "gemini-1.5-pro",
-    ];
-
-    const contents = [
-      {
-        role: "user",
-        parts: [{ text: SYSTEM_INSTRUCTION }],
-      },
-      {
-        role: "model",
-        parts: [{ text: "Understood! I am ready to assist as Aqua AI, Euroaqua Plumtek's AI Product Specialist." }],
-      },
-      ...history.map((m) => ({
-        role: m.role === "assistant" ? "model" : "user",
-        parts: [{ text: m.content }],
-      })),
-      {
-        role: "user",
-        parts: [{ text: userPrompt }],
-      },
-    ];
-
-    let lastError: Error | null = null;
-
-    for (const model of modelsToTry) {
-      try {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${keyToUse}`;
-        const response = await fetch(url, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            contents,
-            generationConfig: {
-              temperature: 0.7,
-              maxOutputTokens: 800,
-            },
-          }),
-        });
-
-        const data = await response.json();
-        if (response.ok && data?.candidates?.[0]?.content?.parts?.[0]?.text) {
-          return data.candidates[0].content.parts[0].text;
-        }
-
-        const errMsg = data?.error?.message || `API error ${response.status}`;
-        lastError = new Error(errMsg);
-      } catch (err: any) {
-        lastError = err;
+      const data = await response.json();
+      if (response.ok && data?.reply) {
+        return data.reply;
       }
+      throw new Error(data?.error || "Chatbot API failed.");
+    } catch (err: any) {
+      throw err;
     }
-
-    throw lastError || new Error("Gemini API connection failed.");
   };
 
   const handleSendMessage = async (textToSend: string) => {
@@ -235,7 +199,7 @@ const AIChatbot = () => {
     setIsTyping(true);
 
     try {
-      const aiReply = await callGeminiAPI(prompt, messages);
+      const aiReply = await callBackendChatAPI(prompt, messages);
       setMessages((prev) => [
         ...prev,
         { id: Date.now() + 1, role: "assistant", content: aiReply },
@@ -306,13 +270,6 @@ const AIChatbot = () => {
                 <RotateCcw className="w-4 h-4" />
               </button>
               <button
-                onClick={() => setShowSettings(!showSettings)}
-                className={`p-2 rounded-xl transition-colors ${showSettings ? "bg-blue-600 text-white" : "text-slate-400 hover:text-white hover:bg-slate-800"}`}
-                title="API Settings"
-              >
-                <Settings className="w-4 h-4" />
-              </button>
-              <button
                 onClick={() => setIsMaximized(!isMaximized)}
                 className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-colors"
                 title={isMaximized ? "Minimize" : "Maximize"}
@@ -328,35 +285,6 @@ const AIChatbot = () => {
               </button>
             </div>
           </div>
-
-          {/* Settings Panel Drawer */}
-          {showSettings && (
-            <div className="bg-slate-900 border-b border-slate-800 p-4 space-y-3 shrink-0 animate-in slide-in-from-top-2 duration-200">
-              <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-300">
-                <span className="flex items-center gap-1.5 text-blue-400">
-                  <Key className="w-3.5 h-3.5" />
-                  Gemini API Key Setting
-                </span>
-                <span className="text-[10px] text-slate-400 font-normal">Optional custom key</span>
-              </div>
-              <input
-                type="password"
-                value={apiKey}
-                onChange={(e) => setApiKey(e.target.value)}
-                placeholder="Paste AI Studio Key (AIzaSy...)"
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 outline-none focus:border-blue-500"
-              />
-              <div className="flex items-center justify-between text-[11px] text-slate-400">
-                <span>Free tier AI Studio keys work automatically</span>
-                <button
-                  onClick={() => setApiKey(DEFAULT_GEMINI_KEY)}
-                  className="text-blue-400 hover:underline font-semibold"
-                >
-                  Reset Default
-                </button>
-              </div>
-            </div>
-          )}
 
           {/* Chat Messages Body */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4 text-xs leading-relaxed bg-slate-950">
